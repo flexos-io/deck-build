@@ -1,0 +1,32 @@
+" print cfg locations:
+"   :scriptnames
+"   :version
+
+" http://stackoverflow.com/a/8932857
+set nocompatible
+
+" utf-8
+set enc=utf-8
+set fenc=utf-8
+set termencoding=utf-8
+
+" visual bell
+set novb
+
+" http://vim.wikia.com/wiki/Converting_tabs_to_spaces
+set tabstop=2
+set shiftwidth=2
+set expandtab
+
+" http://feitel.indeedgeek.de/2009/9/vim-mastery_eingerueckt/
+set noautoindent
+set nosmartindent
+
+" http://openwall.info/wiki/internal/vimrc
+set tw=79
+
+" :help syntax.txt
+map s <ESC>:syntax off<ESC>:syntax on<CR><ESC>
+
+" http://usevim.com/2013/11/08/set-history/
+set history=1000

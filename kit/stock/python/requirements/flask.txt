@@ -1,0 +1,3 @@
+Flask>1,<2
+Flask-Cors>3,<4
+voluptuous>=0.11,<1
