@@ -110,6 +110,7 @@ isUri() {
 buildPlant() {
   ! isz "${_planArg:-}" || usage
   ! isz "${_imgTagArg:-}" || usage
+  trap clean EXIT
   export DECKBUILD_IMG=${_imgTagArg}
   sourceCfgs
   if isUri "${_planArg:-}"; then
@@ -210,7 +211,6 @@ init() {
       *) usage;;
     esac
   done
-  trap clean EXIT
   # export values for child processes
   export DECKBUILD_PUSH=${_pushArg}
   export DECKBUILD_PUSH_LATEST=${_latestArg}

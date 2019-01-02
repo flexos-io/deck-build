@@ -3,7 +3,7 @@ setUser() {
   ##D Configure user environment:
   ##D Reads ${DECKBUILD_USER_CFG} and sets related environment variables
   ##D (e.g. ${DECKBUILD_USER} and ${DECKBUILD_USER_ID}).
-  local userCfg="${DECKBUILD_USER_CFG:-}" # user:uid:sudo:home:group:gid
+  local userCfg="${DECKBUILD_USER_CFG:-}" # user:uid:sudoYesNo[:home:group:gid]
   local userColons=${userCfg//[^:]}
   local emsg="\$DECKBUILD_USER_CFG is invalid"
   if is ${#userColons} 2 || is ${#userColons} 5; then

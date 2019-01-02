@@ -1,4 +1,3 @@
-#!/bin/bash
 
 if [[ " ${DECKBUILD_ARGS:-} " =~ " -e " ]]; then
   set -o errtrace
