@@ -9,7 +9,7 @@ set -o pipefail
 _myFp=$(readlink -f "${0}")
 _myFn=$(basename "${_myFp}")
 _args0="${@}"
-_version=0.1.0
+_version=0.2.0
 
 stderr() {
   echo -e "${1}" >&2
@@ -59,11 +59,12 @@ isb() {
 }
 
 clean() {
+  yellow "Cleaning"
+  isz "${_cleanFps:-}" || rm -rf ${_cleanFps}
   isz "${_tmpDp:-}" || rm -rf ${_tmpDp}
 }
 
 initTmp() {
-  trap clean EXIT
   export _tmpDp=$(mktemp -d)
 }
 
@@ -91,8 +92,7 @@ usage() {
 
 sourceCfgs() {
   local cfgs="${HOME}/.flexos/deck/build/cfg.sh"
-  # support alias $FLEXOS_BUILD_CFGS
-  cfgs="${FLEXOS_CFGS:-} ${FLEXOS_DECK_BUILD_CFGS:-${FLEXOS_BUILD_CFGS:-}}"
+  cfgs="${FLEXOS_CFGS:-} ${DECKBUILD_CFGS:-}"
   local fp=""
   for fp in ${cfgs}; do
     if ! isz ${fp} && ise ${fp}; then
@@ -103,45 +103,53 @@ sourceCfgs() {
 }
 
 isUri() {
-  # dirty: improve me!
+  # very dirty: improve me!
   is~ "${1}" ^git || is~ "${1}" ://
 }
 
 buildPlant() {
   ! isz "${_planArg:-}" || usage
   ! isz "${_imgTagArg:-}" || usage
-  export FLEXOS_IMG=${_imgTagArg}
+  export DECKBUILD_IMG=${_imgTagArg}
   sourceCfgs
   if isUri "${_planArg:-}"; then
     yellow "Plan: ${_planArg}"
-    export FLEXOS_DECK_BUILD_PLAN_URI=1
-    export FLEXOS_DECK_BUILD_PLAN=${_planArg}
-    export FLEXOS_DECK_BUILD_PLANT=/tmp
+    export DECKBUILD_PLAN_URI=1
+    export DECKBUILD_PLAN=${_planArg}
+    export DECKBUILD_PLANT=/tmp
   else
     local planDp=$(readlink -f ${_planArg})
     isd ${planDp} || die "Opening ${planDp}/ failed"
     yellow "Plan: ${planDp}"
-    initTmp
-    local plantDp=${_tmpDp}/plant
-    cp -a ${planDp} ${plantDp}
-    local kitDp=${FLEXOS_DECK_BUILD_KIT:-${FLEXOS_BUILD_KIT:-}} # support alias
+    if isb ${DECKBUILD_TMP_PLANT:-false}; then
+      initTmp
+      local plantDp=${_tmpDp}/plant
+      yellow "DECKBUILD_TMP_PLANT is set: Copying ${planDp}/ to tmp directory"
+      cp -a ${planDp} ${plantDp}
+    else
+      local plantDp=${planDp}
+    fi
+    local kitDp=${DECKBUILD_KIT:-}
     if ! isz "${kitDp}"; then
       isd ${kitDp} || die "Opening ${kitDp}/ failed"
       yellow "Kit: ${kitDp}"
-      cp -a ${kitDp} ${plantDp}/kit
+      local plantKitDp=${plantDp}/.kit
+      rm -rf ${plantKitDp}
+      _cleanFps+=" ${plantKitDp}"
+      cp -a ${kitDp} ${plantKitDp}
     fi
-    export FLEXOS_DECK_BUILD_PLAN_URI=0
-    export FLEXOS_DECK_BUILD_PLAN=${planDp}
-    export FLEXOS_DECK_BUILD_PLANT=${plantDp}
+    export DECKBUILD_PLAN_URI=0
+    export DECKBUILD_PLAN=${planDp}
+    export DECKBUILD_PLANT=${plantDp}
   fi
 }
 
 buildImg() {
-  yellow "Building ${FLEXOS_IMG}"
-  local plantDp=${FLEXOS_DECK_BUILD_PLANT}
+  yellow "Building ${DECKBUILD_IMG}"
+  local plantDp=${DECKBUILD_PLANT}
   cd ${plantDp}
-  if isb ${FLEXOS_DECK_BUILD_PLAN_URI}; then
-    local target=${FLEXOS_DECK_BUILD_PLAN}
+  if isb ${DECKBUILD_PLAN_URI}; then
+    local target=${DECKBUILD_PLAN}
   else
     if isx ${plantDp}/build.sh; then
       if isb ${_skipBuildShArg:-}; then
@@ -154,26 +162,18 @@ buildImg() {
     local target=./
   fi
   local dp=/usr/local/flexos/deck/build
-  # support aliases
-  FLEXOS_DECK_BUILD_USER="${FLEXOS_DECK_BUILD_USER:-${FLEXOS_BUILD_USER:-}}"
-  export FLEXOS_DECK_BUILD_USER
-  FLEXOS_DECK_BUILD_ARGS="${FLEXOS_DECK_BUILD_ARGS:-${FLEXOS_BUILD_ARGS:-}}"
-  export FLEXOS_DECK_BUILD_ARGS
-  docker build --tag ${FLEXOS_IMG} ${_args2} \
-      --build-arg FLEXOS_PLANT=${dp} \
-      --build-arg FLEXOS_KIT_TOOL=${dp}/kit/tool \
-      --build-arg FLEXOS_BUILD_USER=${FLEXOS_DECK_BUILD_USER:-} \
-      --build-arg FLEXOS_BUILD_ARGS="${FLEXOS_DECK_BUILD_ARGS:-}" \
+  export DECKBUILD_USER_CFG="${DECKBUILD_USER_CFG:-}"
+  export DECKBUILD_ARGS="${DECKBUILD_ARGS:-}"
+  docker build --tag ${DECKBUILD_IMG} ${_args2} \
+      --build-arg DECKBUILD_PLANT=${dp} \
+      --build-arg DECKBUILD_KIT_TOOL=${dp}/kit/tool \
+      --build-arg DECKBUILD_USER_CFG=${DECKBUILD_USER_CFG:-} \
+      --build-arg DECKBUILD_ARGS="${DECKBUILD_ARGS:-}" \
     ${target} || die "Building failed"
-  # --build-arg FLEXOS_IMG=${FLEXOS_IMG}
-  # --build-arg FLEXOS_PLAN=${FLEXOS_DECK_BUILD_PLAN}
-  # --build-arg FLEXOS_KIT=${dp}/kit
-  # --build-arg FLEXOS_KIT_STOCK=${dp}/kit/stock
-  # --build-arg FLEXOS_BUILD_VERSION=${_version}
 }
 
 pushImg() {
-  local imgTag=${FLEXOS_IMG}
+  local imgTag=${DECKBUILD_IMG}
   yellow "Pushing to docker-hub"
   docker login || die "Login to docker-hub failed"
   yellow "Pushing ${imgTag}"
@@ -210,10 +210,11 @@ init() {
       *) usage;;
     esac
   done
+  trap clean EXIT
   # export values for child processes
-  export FLEXOS_DECK_BUILD_PUSH=${_pushArg}
-  export FLEXOS_DECK_BUILD_PUSH_LATEST=${_latestArg}
-  export FLEXOS_DECK_BUILD_FORCE=${_forceArg}
+  export DECKBUILD_PUSH=${_pushArg}
+  export DECKBUILD_PUSH_LATEST=${_latestArg}
+  export DECKBUILD_FORCE=${_forceArg}
 }
 
 init
