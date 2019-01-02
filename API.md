@@ -1,4 +1,4 @@
-# deck-build Kit API
+# deck-build API
 
 ## `addToBashd`
 
@@ -441,7 +441,7 @@ installPyPkgs <requirements_file>
 #### Examples
 
 ```shell
-installPyPkgs /tmp/root_reqs           # install packages for root
+installPyPkgs /tmp/root_reqs           # install packages for root 
 sudof foo installPyPkgs /tmp/foo_reqs  # install packages for user foo
 ```
 
