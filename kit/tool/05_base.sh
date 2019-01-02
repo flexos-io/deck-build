@@ -120,7 +120,7 @@ error() {
 }
 
 die() {
-  ##C <message> <exit_code>
+  ##C <message> [<exit_code>]
   ##D Print a red error message to stderr and abort process.
   ##E die "Database unreachable"     # exit code is 1
   ##E die "No network connection" 5  # exit code is 5

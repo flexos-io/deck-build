@@ -179,7 +179,7 @@ Print a red error message to stderr and abort process.
 #### Usage
 
 ```shell
-die <message> <exit_code>
+die <message> [<exit_code>]
 ```
 
 #### Examples
