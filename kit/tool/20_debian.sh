@@ -1,45 +1,59 @@
 
 aptInstall() {
+  ##C <packages>
+  ##D Install debian packages ("apt-get install").
+  ##E aptInstall curl wget
   apt-get -y -f --no-install-recommends install ${*}
 }
 
 initDebPkgs() {
-  if ! isb "${_FLEXOS_DEB_REPO_INIT:-}"; then
+  ##D Update debian package repository if necessary ("apt-get update").
+  ##D Necessary means: ${_DECKBUILD_DEB_REPO_INIT} is not set
+  ##D (initDebPkgs() sets ${_DECKBUILD_DEB_REPO_INIT} after running).
+  ##E unset ${_DECKBUILD_DEB_REPO_INIT}; initDebPkgs  # force action
+  if ! isb "${_DECKBUILD_DEB_REPO_INIT:-}"; then
     yellow "Initializing package repository"
     apt-get -y update || die "Updating package repository failed"
-    export _FLEXOS_DEB_REPO_INIT=1
+    export _DECKBUILD_DEB_REPO_INIT=1
   fi
 }
 
 cleanDebPkgs() {
+  ##C [<delete_files>]
+  ##D Clean debian package repository ("apt-get autoremove").
+  ##A delete_files = Clear also /var/lib/apt/lists/* if set to "true" or "1"
+  ##E cleanDebPkgs true
+  local noFiles=${1:-1}
   yellow "Cleaning and checking packages"
   apt-get -y autoremove || die "Cleaning packages failed"
   apt-get -y -f --no-install-recommends install || \
     die "Checking packages failed"
-  #rm -rf /var/lib/apt/lists/*
+  isb ${noFiles} || rm -rf /var/lib/apt/lists/*
 }
 
 installDebBatPkg() {
+  ##D Install bat's (https://github.com/sharkdp/bat) latest version.
   initDebPkgs
   yellow "Installing bat"
   getGitHubLatest sharkdp/bat
-  local vv=${_FLEXOS_GITHUB_LATEST}
-  local v=${_FLEXOS_GITHUB_LATEST/v}
+  local v=${_DECKBUILD_GITHUB_LATEST/v}
   local fp=/usr/local/src/bat_${v}.deb
   local url=https://github.com/sharkdp/bat/releases/download/
-  url+=${_FLEXOS_GITHUB_LATEST}/bat_${v}_amd64.deb
+  url+=${_DECKBUILD_GITHUB_LATEST}/bat_${v}_amd64.deb
   dload ${url} ${fp}
   ! isz "${fp}" || die "Getting bat failed"
   dpkg -i ${fp} || die "Installing bat failed"
 }
 
 upgradeDebPkgs() {
+  ##D Upgrade all debian packages ("apt-get upgrade").
   initDebPkgs
   yellow "Upgrading packages"
   apt-get -y --no-install-recommends upgrade || die "Upgrading packages failed"
 }
 
 installDebPkgs() {
+  ##D Install some useful debian packages ("apt-get install sudo curl ...").
   initDebPkgs
   yellow "Installing packages"
   apt-get -y --no-install-recommends install \

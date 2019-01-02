@@ -1,24 +1,26 @@
 
 setUser() {
-  # e.g. FLEXOS_BUILD_USER=root:0:0:/root:root:0
-  local userCfg="${FLEXOS_BUILD_USER:-}" # user:uid:sudo:home:group:gid
+  ##D Configure user environment:
+  ##D Reads ${DECKBUILD_USER_CFG} and sets related environment variables
+  ##D (e.g. ${DECKBUILD_USER} and ${DECKBUILD_USER_ID}).
+  local userCfg="${DECKBUILD_USER_CFG:-}" # user:uid:sudo:home:group:gid
   local userColons=${userCfg//[^:]}
-  local emsg="\$FLEXOS_BUILD_USER is invalid"
+  local emsg="\$DECKBUILD_USER_CFG is invalid"
   if is ${#userColons} 2 || is ${#userColons} 5; then
-    export FLEXOS_USER=$(echo ${userCfg} | cut -d: -f1)
-    ! isz "${FLEXOS_USER:-}" || die "${emsg}: User-name is invalid"
-    export FLEXOS_USER_ID=$(echo ${userCfg} | cut -d: -f2)
-    isn "${FLEXOS_USER_ID:-}" || die "${emsg}: User-ID is invalid"
-    export FLEXOS_USER_SUDO=$(echo ${userCfg} | cut -d: -f3)
-    is "${FLEXOS_USER_SUDO:-}" 0 || is "${FLEXOS_USER_SUDO:-}" 1 || \
+    export DECKBUILD_USER=$(echo ${userCfg} | cut -d: -f1)
+    ! isz "${DECKBUILD_USER:-}" || die "${emsg}: User-name is invalid"
+    export DECKBUILD_USER_ID=$(echo ${userCfg} | cut -d: -f2)
+    isn "${DECKBUILD_USER_ID:-}" || die "${emsg}: User-ID is invalid"
+    export DECKBUILD_USER_SUDO=$(echo ${userCfg} | cut -d: -f3)
+    is "${DECKBUILD_USER_SUDO:-}" 0 || is "${DECKBUILD_USER_SUDO:-}" 1 || \
       die "${emsg}: User-sudo is invalid"
     if is ${#userColons} 5; then
-      export FLEXOS_USER_HOME=$(echo ${userCfg} | cut -d: -f4)
-      ! isz "${FLEXOS_USER_HOME:-}" || die "${emsg}: User-home is invalid"
-      export FLEXOS_GROUP=$(echo ${userCfg} | cut -d: -f5)
-      ! isz "${FLEXOS_GROUP:-}" || die "${emsg}: Group-name is invalid"
-      export FLEXOS_GROUP_ID=$(echo ${userCfg} | cut -d: -f6)
-      isn "${FLEXOS_GROUP_ID:-}" || die "${emsg}: Group-ID is invalid"
+      export DECKBUILD_USER_HOME=$(echo ${userCfg} | cut -d: -f4)
+      ! isz "${DECKBUILD_USER_HOME:-}" || die "${emsg}: User-home is invalid"
+      export DECKBUILD_GROUP=$(echo ${userCfg} | cut -d: -f5)
+      ! isz "${DECKBUILD_GROUP:-}" || die "${emsg}: Group-name is invalid"
+      export DECKBUILD_GROUP_ID=$(echo ${userCfg} | cut -d: -f6)
+      isn "${DECKBUILD_GROUP_ID:-}" || die "${emsg}: Group-ID is invalid"
     fi
   else
     die "${emsg}"
@@ -26,6 +28,19 @@ setUser() {
 }
 
 installUser() {
+  ##C user user_id [user_home] [group] [group_id] [user_args] [group_args]
+  ##D Create a user (and group).
+  ##A user = User name
+  ##A user_id = User ID
+  ##A user_home = Path to user's home directory
+  ##A group = Group name
+  ##A group_id = Group ID
+  ##A user_args = Additional arguments for "useradd" command
+  ##A group_args = Additional arguments for "groupadd" command
+  ##E installUser foo 1001
+  ##E installUser foo 1001 /home/user/foo
+  ##E installUser foo 1001 /home/foo bar 2002
+  ##E installUser foo 1001 /home/foo bar 2002 "-M" "-p myEncrPw"
   local user=${1}
   local uid=${2}
   local userDp=${3:-/home/${user}}
@@ -55,46 +70,72 @@ installUser() {
 }
 
 installSudoUser() {
+  ##C <user> [<sudo_args>]
+  ##D Enable sudo for given user.
+  ##A sudo_args = sudo arguments, default is: "ALL=(ALL) NOPASSWD:ALL"
+  ##E installSudoUser foo
+  ##E setUser; installSudoUser ${DECKBUILD_USER}
   local user=${1}
-  local params="${2:-ALL=(ALL) NOPASSWD:ALL}"
+  local args="${2:-ALL=(ALL) NOPASSWD:ALL}"
   local dp=/etc/sudoers.d
   isd ${dp} || die "Opening ${dp}/ failed: Is 'sudo' installed?"
   yellow "Enabling sudo for ${user}"
-  echo "${user} ${params}" > ${dp}/${user}
+  echo "${user} ${args}" > ${dp}/${user}
   chmod 440 ${dp}/${user}
 }
 
 installBashd() {
+  ##C [<directory_path>]
+  ##D Initialize "bash.d" environment:
+  ##D bash.d folders store bash profile files.
+  ##D Profile files will be read (sourced) during container startup.
+  ##D BUT: Don't call this function directly, use addToBashd() instead.
+  ##A directory_path = bash.d parent folder, default is user's ${HOME}
+  ##E installBashd            # creates /root/.bash.d
+  ##E sudof foo installBashd  # creates /home/foo/.bash.d
+  ##E installBashd etc        # creates /etc/bash.d
   local dp="${1:-}"
   if isz "${dp}"; then
-    export _FLEXOS_BASHD=${HOME}/.bash.d
+    export _DECKBUILD_BASHD=${HOME}/.bash.d
     local cmdDp="\${HOME}/.bash.d"
     local fp=${HOME}/.bashrc
   else
-    export _FLEXOS_BASHD=${dp}/bash.d
-    local cmdDp=${_FLEXOS_BASHD}
+    export _DECKBUILD_BASHD=${dp}/bash.d
+    local cmdDp=${_DECKBUILD_BASHD}
     local fp=/etc/bash.bashrc
   fi
-  mkdir -p ${_FLEXOS_BASHD}
+  mkdir -p ${_DECKBUILD_BASHD}
   local cmd="for _fp in ${cmdDp}/*.sh; do . \${_fp}; done; unset _fp"
   if ! grep -F -q "${cmd}" ${fp} 2>/dev/null; then
     yellow "Adding bash.d sourcing to ${fp}"
-    echo -e "\n# flexos\n${cmd}\n" >> ${fp} || \
+    echo -e "\n# deck-build\n${cmd}\n" >> ${fp} || \
       die "Adding bash.d sourcing to ${fp} failed"
   fi
 }
 
 addToBashd() {
+  ##C <file_path> [<directory_path>]
+  ##D Add and read (source) a "bash.d" profile file
+  ##D (see installBashd() for bash.d details).
+  ##A file_path = Path to profile file
+  ##A directory_path = bash.d parent folder, see installBashd() for details
+  ##E addToBashd /tmp/bar            # creates /root/.bash.d/bar
+  ##E addToBashd /tmp/bar etc        # creates /etc/bash.d/bar
+  ##E sudof foo addToBashd /tmp/bar  # creates /home/foo/.bash.d/bar
+  ##E sudof foo addToBashd ${DECKBUILD_KIT_STOCK}/python/55_python.sh
   local srcFp="${1}"
   installBashd "${2:-}"
-  local dstFp=${_FLEXOS_BASHD}/$(basename ${srcFp})
+  local dstFp=${_DECKBUILD_BASHD}/$(basename ${srcFp})
   yellow "Installing ${dstFp}"
-  cp -a ${srcFp} ${dstFp} || die "Adding ${srcFp} to ${_FLEXOS_BASHD}/ failed"
+  cp -a ${srcFp} ${dstFp} || \
+    die "Adding ${srcFp} to ${_DECKBUILD_BASHD}/ failed"
   yellow "Sourcing ${dstFp}"
   . ${dstFp} || die "Sourcing ${dstFp} failed"
 }
 
 installDirs() {
+  ##D Simplify system's directory structure
+  ##D (e.g. merge /usr/local/bin and /usr/local/sbin).
   yellow "Optimizing /usr/local/ and /opt/"
   mkdir -p -m 755 /usr/local/bin /usr/local/src
   mv /opt/bin/* /usr/local/bin/ 2>/dev/null || :

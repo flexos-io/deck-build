@@ -1,4 +1,4 @@
-# deck-build API
+# deck-build Kit API
 
 ## `addToBashd`
 
@@ -52,12 +52,6 @@ Print a black message to stderr.
 black <message>
 ```
 
-#### Examples
-
-```shell
-black "Hello World"
-```
-
 ## `blue`
 
 Print a blue message to stderr.
@@ -66,12 +60,6 @@ Print a blue message to stderr.
 
 ```shell
 blue <message>
-```
-
-#### Examples
-
-```shell
-blue "Hello World"
 ```
 
 ## `cleanDebPkgs`
@@ -132,15 +120,9 @@ Print a cyan message to stderr.
 cyan <message>
 ```
 
-#### Examples
-
-```shell
-cyan "Hello World"
-```
-
 ## `die`
 
-Print a red ERROR message to stderr and abort process.
+Print a red error message to stderr and abort process.
 
 #### Usage
 
@@ -168,13 +150,13 @@ dload <url> [<destination_file>]
 #### Examples
 
 ```shell
-dload https://example.org/foo.txt /tmp/foo.txt
-fooTxt=$(dload https://example.org/foo.txt)
+dload https://example.org/foo.txt /tmp/foo.txt # download to file
+fooTxt=$(dload https://example.org/foo.txt)    # assign to fooTxt variable
 ```
 
 ## `error`
 
-Print a red ERROR message to stderr.
+Print a red error message to stderr.
 
 #### Usage
 
@@ -229,12 +211,6 @@ Print a green message to stderr.
 
 ```shell
 green <message>
-```
-
-#### Examples
-
-```shell
-green "Hello World"
 ```
 
 ## `hasBuildArg`
@@ -371,7 +347,7 @@ installDebPkgs
 
 ## `installDirs`
 
-Optimize system's directory structure (e.g. merge /usr/local/bin and /usr/local/sbin).
+Simplify system's directory structure (e.g. merge /usr/local/bin and /usr/local/sbin).
 
 #### Usage
 
@@ -465,7 +441,7 @@ installPyPkgs <requirements_file>
 #### Examples
 
 ```shell
-installPyPkgs /tmp/root_reqs           # install packages for root 
+installPyPkgs /tmp/root_reqs           # install packages for root
 sudof foo installPyPkgs /tmp/foo_reqs  # install packages for user foo
 ```
 
@@ -546,7 +522,7 @@ if is foo bar; then ...
 
 ## `isb`
 
-(Boolean) Check if value is true. Returns 1 (false) for "0", "false" and empty values. Returns 0 (true) for other values.
+Boolean-check if value is true. Returns 1 (false) for "0", "false" and empty values. Returns 0 (true) for other values.
 
 #### Usage
 
@@ -712,12 +688,6 @@ Print a pink message to stderr.
 pink <message>
 ```
 
-#### Examples
-
-```shell
-pink "Hello World"
-```
-
 ## `red`
 
 Print a red message to stderr.
@@ -728,12 +698,6 @@ Print a red message to stderr.
 red <message>
 ```
 
-#### Examples
-
-```shell
-red "Hello World"
-```
-
 ## `redBold`
 
 Print a bold red message to stderr.
@@ -742,12 +706,6 @@ Print a bold red message to stderr.
 
 ```shell
 redBold <message>
-```
-
-#### Examples
-
-```shell
-redBold "Hello World"
 ```
 
 ## `setUser`
@@ -762,7 +720,7 @@ setUser
 
 ## `stderr`
 
-Print message to stderr.
+Print a message to stderr.
 
 #### Usage
 
@@ -801,7 +759,7 @@ sudoc foo ls /home/foo
 
 ## `sudof`
 
-Run function as given user.
+Run shell function as given user.
 
 #### Usage
 
@@ -828,7 +786,7 @@ upgradeDebPkgs
 
 ## `warn`
 
-Print a red WARN message to stderr.
+Print a red warning message to stderr.
 
 #### Usage
 
@@ -852,12 +810,6 @@ Print a white message to stderr.
 white <message>
 ```
 
-#### Examples
-
-```shell
-white "Hello World"
-```
-
 ## `yellow`
 
 Print a yellow message to stderr.
@@ -866,10 +818,4 @@ Print a yellow message to stderr.
 
 ```shell
 yellow <message>
-```
-
-#### Examples
-
-```shell
-yellow "Hello World"
 ```

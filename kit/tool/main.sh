@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [[ " ${FLEXOS_BUILD_ARGS:-} " =~ " -e " ]]; then
+if [[ " ${DECKBUILD_ARGS:-} " =~ " -e " ]]; then
   set -o errtrace
   set -o nounset
   set -o errexit
@@ -8,5 +8,5 @@ if [[ " ${FLEXOS_BUILD_ARGS:-} " =~ " -e " ]]; then
   #set -o posix
 fi
 
-for _fp in ${FLEXOS_KIT_TOOL}/*_*.sh; do . ${_fp}; done
-initTmp 777
+for _fp in ${DECKBUILD_KIT_TOOL}/*_*.sh; do . ${_fp}; done
+initTmp
