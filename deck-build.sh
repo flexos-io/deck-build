@@ -122,10 +122,14 @@ buildPlant() {
     local planDp=$(readlink -f ${_planArg})
     isd ${planDp} || die "Opening ${planDp}/ failed"
     yellow "Plan: ${planDp}"
+    if isx ${planDp}/build.sh; then
+      export DECKBUILD_TMP_PLANT=true
+      yellow "build.sh found: Enabling DECKBUILD_TMP_PLANT"
+    fi
     if isb ${DECKBUILD_TMP_PLANT:-false}; then
       initTmp
+      yellow "DECKBUILD_TMP_PLANT is enabled: Copying ${planDp}/ to tmp folder"
       local plantDp=${_tmpDp}/plant
-      yellow "DECKBUILD_TMP_PLANT is set: Copying ${planDp}/ to tmp directory"
       cp -a ${planDp} ${plantDp}
     else
       local plantDp=${planDp}
@@ -152,12 +156,13 @@ buildImg() {
   if isb ${DECKBUILD_PLAN_URI}; then
     local target=${DECKBUILD_PLAN}
   else
-    if isx ${plantDp}/build.sh; then
+    local buildShFp=${plantDp}/build.sh
+    if isx ${buildShFp}; then
       if isb ${_skipBuildShArg:-}; then
         yellow "Skipping build.sh"
       else
         yellow "Running build.sh"
-        ${plantDp}/build.sh || die "Running ${plantDp}/build.sh failed"
+        ${buildShFp} || die "Running ${buildShFp} failed"
       fi
     fi
     local target=./
