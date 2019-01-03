@@ -30,4 +30,6 @@ installPyPkgs() {
   cp -a ${srcFp} ${dstFp} || die "Installing ${srcFp} failed"
   pip install -r ${dstFp} || \
     die "Installing ${dstFp} pip packages failed"
+  cd ${HOME}/.local/lib
+  ln -sf $(basename $(ls -d python*/ | tail -n1)) python
 }
