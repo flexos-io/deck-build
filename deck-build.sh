@@ -134,7 +134,7 @@ buildPlant() {
     else
       local plantDp=${planDp}
     fi
-    local kitDp=${DECKBUILD_KIT:-}
+    local kitDp=${DECKBUILD_KIT_SRC:-}
     if ! isz "${kitDp}"; then
       isd ${kitDp} || die "Opening ${kitDp}/ failed"
       yellow "Kit: ${kitDp}"
@@ -172,7 +172,7 @@ buildImg() {
   export DECKBUILD_ARGS="${DECKBUILD_ARGS:-}"
   docker build --tag ${DECKBUILD_IMG} ${_args2} \
       --build-arg DECKBUILD_PLANT=${dp} \
-      --build-arg DECKBUILD_KIT_TOOL=${dp}/kit/tool \
+      --build-arg DECKBUILD_KIT=${dp}/kit \
       --build-arg DECKBUILD_USER_CFG=${DECKBUILD_USER_CFG:-} \
       --build-arg DECKBUILD_ARGS="${DECKBUILD_ARGS:-}" \
     ${target} || die "Building failed"

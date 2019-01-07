@@ -7,5 +7,5 @@ if [[ " ${DECKBUILD_ARGS:-} " =~ " -e " ]]; then
   #set -o posix
 fi
 
-for _fp in ${DECKBUILD_KIT_TOOL}/*_*.sh; do . ${_fp}; done
+for _fp in ${DECKBUILD_KIT}/*_*.sh; do . ${_fp}; done
 initTmp
