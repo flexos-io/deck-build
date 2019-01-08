@@ -110,10 +110,20 @@ isUri() {
 checkIntegrity() {
   local planDp=${1}
   local dckrFp=${2}
-  if grep -q -P '^\s*COPY\s+\.kit\s+\${?DECKBUILD_KIT}?\s*$' ${dckrFp} && \
-     isz "${DECKBUILD_KIT_SRC:-}"
-  then
-    die "Dockerfile wants to COPY kit but \${DECKBUILD_KIT_SRC} is not set"
+  # check for the following Dockerfile lines:
+  #  ADD https://github.com/flexos-io/deck-build/raw/master/kit/kit.tgz ${DECKBUILD_PLANT}/
+  #  RUN cd ${DECKBUILD_PLANT} && tar --no-same-owner -zxpf kit.tgz && rm kit.tgz
+  #  RUN tar --no-same-owner -zxpf ${DECKBUILD_PLANT}/kit.tgz -C ${DECKBUILD_PLANT} && rm ${DECKBUILD_PLANT}/kit.tgz
+  #  COPY .kit ${DECKBUILD_KIT}
+  if grep -q -P '^\s*(COPY|ADD)\s+\.kit\s+\${?DECKBUILD_KIT}?\s*$' ${dckrFp}; then
+    if grep -q -P '^\s*ADD\s+https://github.com/.+/kit\.tgz\s+\${?DECKBUILD_PLANT}?/(kit\.tgz)?\s*$' ${dckrFp} || \
+       grep -q -P '^\s*RUN\s+.+\${?DECKBUILD_PLANT}?.+\s+tar\s+.+\s+kit.tgz(\s+.+)?\s*$' ${dckrFp} || \
+       grep -q -P '^\s*RUN\s+(.*\s+)?tar\s+.+\s\${?DECKBUILD_PLANT}?/kit.tgz(\s+.+)?\s*$' ${dckrFp}
+    then
+      die "Dockerfile wants to COPY and to download kit: Don't enable both"
+    fi
+    isz "${DECKBUILD_KIT_SRC:-}" && \
+      die "Dockerfile wants to COPY kit but \${DECKBUILD_KIT_SRC} is not set"
   fi
   if grep -q -P -r --include='*.sh' '^\s*setUser(\s*$|\s*#)' ${planDp} && \
      isz "${DECKBUILD_USER_CFG:-}"
