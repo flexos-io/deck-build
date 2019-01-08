@@ -16,10 +16,10 @@ installFlexos() {
   rm ${_DECKBUILD_TMP_CFG}
 }
 
-installFlexosBasher() {
+installFlexosSh() {
   ##D Install flexos basher packages (for specific user).
-  ##E installFlexosBasher             # install packages for root
-  ##E sudof foo installFlexosBasher   # install packages for user foo
+  ##E installFlexosSh             # install packages for root
+  ##E sudof foo installFlexosSh   # install packages for user foo
   installBasherPkg flexos-io/flexos-sh-base
   installBasherPkg flexos-io/flexos-sh-tool
 }

@@ -22,8 +22,8 @@
 - [installDebPkgs](#installDebPkgs)
 - [installDirs](#installDirs)
 - [installFlexos](#installFlexos)
-- [installFlexosBasher](#installFlexosBasher)
 - [installFlexosPy](#installFlexosPy)
+- [installFlexosSh](#installFlexosSh)
 - [installPy](#installPy)
 - [installPyPkgs](#installPyPkgs)
 - [installSudoUser](#installSudoUser)
@@ -429,23 +429,6 @@ installFlexos            # adds flexos files to root's bash.d folder
 sudo foo installFlexos   # adds flexos files to user foo's bash.d folder
 ```
 
-## `installFlexosBasher`
-
-Install flexos basher packages (for specific user).
-
-#### Usage
-
-```shell
-installFlexosBasher
-```
-
-#### Examples
-
-```shell
-installFlexosBasher             # install packages for root
-sudof foo installFlexosBasher   # install packages for user foo
-```
-
 ## `installFlexosPy`
 
 Install flexos python packages (for specific user).
@@ -461,6 +444,23 @@ installFlexosPy
 ```shell
 installFlexosPy             # install packages for root
 sudof foo installFlexosPy   # install packages for user foo
+```
+
+## `installFlexosSh`
+
+Install flexos basher packages (for specific user).
+
+#### Usage
+
+```shell
+installFlexosSh
+```
+
+#### Examples
+
+```shell
+installFlexosSh             # install packages for root
+sudof foo installFlexosSh   # install packages for user foo
 ```
 
 ## `installPy`
