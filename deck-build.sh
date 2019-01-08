@@ -120,15 +120,15 @@ checkIntegrity() {
        grep -q -P '^\s*RUN\s+.+\${?DECKBUILD_PLANT}?.+\s+tar\s+.+\s+kit.tgz(\s+.+)?\s*$' ${dckrFp} || \
        grep -q -P '^\s*RUN\s+(.*\s+)?tar\s+.+\s\${?DECKBUILD_PLANT}?/kit.tgz(\s+.+)?\s*$' ${dckrFp}
     then
-      die "Dockerfile wants to COPY and to download kit: Don't enable both"
+      die "Dockerfile wants to COPY and download kit: Don't enable both. See https://github.com/flexos-io/doc/wiki/deck_build#Configuration-Define-The-Kit"
     fi
     isz "${DECKBUILD_KIT_SRC:-}" && \
-      die "Dockerfile wants to COPY kit but \${DECKBUILD_KIT_SRC} is not set"
+      die "Dockerfile wants to COPY kit but \${DECKBUILD_KIT_SRC} is not set. See https://github.com/flexos-io/doc/wiki/deck_build#Configuration-Define-The-Kit"
   fi
   if grep -q -P -r --include='*.sh' '^\s*setUser(\s*$|\s*#)' ${planDp} && \
      isz "${DECKBUILD_USER_CFG:-}"
   then
-    die "Plan uses kit's setUser() but \${DECKBUILD_USER_CFG} is not set"
+    die "Plan uses kit's setUser() but \${DECKBUILD_USER_CFG} is not set. See https://github.com/flexos-io/doc/wiki/deck_build#Configuration-Abstract-The-Custom-User"
   fi
 }
 
