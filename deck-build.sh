@@ -107,6 +107,21 @@ isUri() {
   is~ "${1}" ^git || is~ "${1}" ://
 }
 
+checkIntegrity() {
+  local planDp=${1}
+  local dckrFp=${2}
+  if grep -q -P '^\s*COPY\s+\.kit\s+\${?DECKBUILD_KIT}?\s*$' ${dckrFp} && \
+     isz "${DECKBUILD_KIT_SRC:-}"
+  then
+    die "Dockerfile wants to COPY kit but \${DECKBUILD_KIT_SRC} is not set"
+  fi
+  if grep -q -P -r --include='*.sh' '^\s*setUser(\s*$|\s*#)' ${planDp} && \
+     isz "${DECKBUILD_USER_CFG:-}"
+  then
+    die "Plan uses kit's setUser() but \${DECKBUILD_USER_CFG} is not set"
+  fi
+}
+
 buildPlant() {
   ! isz "${_planArg:-}" || usage
   ! isz "${_imgTagArg:-}" || usage
@@ -121,6 +136,9 @@ buildPlant() {
   else
     local planDp=$(readlink -f ${_planArg})
     isd ${planDp} || die "Opening ${planDp}/ failed"
+    dckrFp=${planDp}/Dockerfile
+    ise ${dckrFp} || die "Opening ${_dckrFp} failed"
+    checkIntegrity ${planDp} ${dckrFp}
     yellow "Plan: ${planDp}"
     if isx ${planDp}/build.sh; then
       export DECKBUILD_TMP_PLANT=true
