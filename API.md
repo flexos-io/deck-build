@@ -1,60 +1,60 @@
-- [addToBashd](#addToBashd)
-- [aptInstall](#aptInstall)
-- [black](#black)
-- [blue](#blue)
-- [cleanDebPkgs](#cleanDebPkgs)
-- [cleanTmp](#cleanTmp)
-- [clearBasher](#clearBasher)
-- [cyan](#cyan)
-- [die](#die)
-- [dload](#dload)
-- [error](#error)
-- [getGitHubLatest](#getGitHubLatest)
-- [getUserDp](#getUserDp)
-- [green](#green)
-- [hasBuildArg](#hasBuildArg)
-- [initDebPkgs](#initDebPkgs)
-- [initTmp](#initTmp)
-- [installBashd](#installBashd)
-- [installBasher](#installBasher)
-- [installBasherPkg](#installBasherPkg)
-- [installDebBatPkg](#installDebBatPkg)
-- [installDebPkgs](#installDebPkgs)
-- [installDirs](#installDirs)
-- [installFlexos](#installFlexos)
-- [installFlexosPy](#installFlexosPy)
-- [installFlexosSh](#installFlexosSh)
-- [installPy](#installPy)
-- [installPyPkgs](#installPyPkgs)
-- [installSudoUser](#installSudoUser)
-- [installUser](#installUser)
-- [is](#is)
-- [isb](#isb)
-- [isc](#isc)
-- [isd](#isd)
-- [ise](#ise)
-- [isl](#isl)
-- [isn](#isn)
-- [isr](#isr)
-- [isx](#isx)
-- [isz](#isz)
-- [pink](#pink)
-- [red](#red)
-- [redBold](#redBold)
-- [setUser](#setUser)
-- [stderr](#stderr)
-- [sudoc](#sudoc)
-- [sudof](#sudof)
-- [upgradeDebPkgs](#upgradeDebPkgs)
-- [warn](#warn)
-- [white](#white)
-- [yellow](#yellow)
+- [`addToBashd`](#addToBashd)
+- [`aptInstall`](#aptInstall)
+- [`black`](#black)
+- [`blue`](#blue)
+- [`cleanDebPkgs`](#cleanDebPkgs)
+- [`cleanTmp`](#cleanTmp)
+- [`clearBasher`](#clearBasher)
+- [`cyan`](#cyan)
+- [`die`](#die)
+- [`dload`](#dload)
+- [`error`](#error)
+- [`getGitHubLatest`](#getGitHubLatest)
+- [`getUserDp`](#getUserDp)
+- [`green`](#green)
+- [`hasBuildArg`](#hasBuildArg)
+- [`initDebPkgs`](#initDebPkgs)
+- [`initTmp`](#initTmp)
+- [`installBashd`](#installBashd)
+- [`installBasher`](#installBasher)
+- [`installBasherPkg`](#installBasherPkg)
+- [`installDebBatPkg`](#installDebBatPkg)
+- [`installDebPkgs`](#installDebPkgs)
+- [`installDirs`](#installDirs)
+- [`installFlexos`](#installFlexos)
+- [`installFlexosPy`](#installFlexosPy)
+- [`installFlexosSh`](#installFlexosSh)
+- [`installPy`](#installPy)
+- [`installPyPkgs`](#installPyPkgs)
+- [`installSudoUser`](#installSudoUser)
+- [`installUser`](#installUser)
+- [`is`](#is)
+- [`isb`](#isb)
+- [`isc`](#isc)
+- [`isd`](#isd)
+- [`ise`](#ise)
+- [`isl`](#isl)
+- [`isn`](#isn)
+- [`isr`](#isr)
+- [`isx`](#isx)
+- [`isz`](#isz)
+- [`pink`](#pink)
+- [`red`](#red)
+- [`redBold`](#redBold)
+- [`setUser`](#setUser)
+- [`stderr`](#stderr)
+- [`sudoc`](#sudoc)
+- [`sudof`](#sudof)
+- [`upgradeDebPkgs`](#upgradeDebPkgs)
+- [`warn`](#warn)
+- [`white`](#white)
+- [`yellow`](#yellow)
 
 ***
 
 ## `addToBashd`
 
-Add and read (source) a "bash.d" profile file (see installBashd() for bash.d details).
+Add and read (source) a `bash.d` profile file (see `installBashd()` for `bash.d` details).
 
 #### Usage
 
@@ -67,7 +67,7 @@ addToBashd <file_path> [<directory_path>]
 - file_path
     - Path to profile file
 - directory_path
-    - bash.d parent folder, see installBashd() for details
+    - `bash.d` parent folder, see `installBashd()` for details
 
 #### Examples
 
@@ -80,7 +80,7 @@ sudof foo addToBashd ${DECKBUILD_KIT_STOCK}/python/55_python.sh
 
 ## `aptInstall`
 
-Install debian packages ("apt-get install").
+Install debian packages (`apt-get install`).
 
 #### Usage
 
@@ -116,7 +116,7 @@ blue <message>
 
 ## `cleanDebPkgs`
 
-Clean debian package repository ("apt-get autoremove").
+Clean debian package repository (`apt-get autoremove`).
 
 #### Usage
 
@@ -127,7 +127,7 @@ cleanDebPkgs [<delete_files>]
 #### Arguments
 
 - delete_files
-    - Clear also /var/lib/apt/lists/* if set to "true" or "1"
+    - Clear also `/var/lib/apt/lists/*` if set to `true` or `1`
 
 #### Examples
 
@@ -137,7 +137,7 @@ cleanDebPkgs true
 
 ## `cleanTmp`
 
-Delete the temporary directory created by initTmp().
+Delete the temporary directory created by `initTmp()`.
 
 #### Usage
 
@@ -154,7 +154,7 @@ initTmp; cleanTmp     # create/clean a custom tmp folder
 
 ## `clearBasher`
 
-Clear basher environment ("unset BASHER_*").
+Clear basher environment (`unset BASHER_*`).
 
 #### Usage
 
@@ -191,7 +191,7 @@ die "No network connection" 5  # exit code is 5
 
 ## `dload`
 
-Download file ("curl https://...").
+Download file (`curl https://...`).
 
 #### Usage
 
@@ -224,7 +224,7 @@ error "Downloading file failed"
 
 ## `getGitHubLatest`
 
-Get latest software version of a GitHub repository: Returns the version and sets ${_DECKBUILD_GITHUB_LATEST}.
+Get latest software version of a GitHub repository: Returns the version and sets `${_DECKBUILD_GITHUB_LATEST}`.
 
 #### Usage
 
@@ -267,7 +267,7 @@ green <message>
 
 ## `hasBuildArg`
 
-Check if ${DECKBUILD_ARGS} contains given argument.
+Check if `${DECKBUILD_ARGS}` contains given argument.
 
 #### Usage
 
@@ -278,7 +278,7 @@ hasBuildArg <arg> [<separator>]
 #### Arguments
 
 - separator
-    - Argument separator (e.g. ","), default is whitespace
+    - Argument separator (e.g. `,`), default is whitespace
 
 #### Examples
 
@@ -289,7 +289,7 @@ hasBuildArg -A ,
 
 ## `initDebPkgs`
 
-Update debian package repository if necessary ("apt-get update"). Necessary means: ${_DECKBUILD_DEB_REPO_INIT} is not set (initDebPkgs() sets ${_DECKBUILD_DEB_REPO_INIT} after running).
+Update debian package repository if necessary (`apt-get update`). Necessary means: `${_DECKBUILD_DEB_REPO_INIT}` is not set (`initDebPkgs()` sets `${_DECKBUILD_DEB_REPO_INIT}` after running).
 
 #### Usage
 
@@ -305,7 +305,7 @@ unset ${_DECKBUILD_DEB_REPO_INIT}; initDebPkgs  # force action
 
 ## `initTmp`
 
-Create a temporary directory (mktemp -d) and export the path as ${_DECKBUILD_TMP}. BUT: You don't need to run initTmp() because a default tmp folder is always available.
+Create a temporary directory (`mktemp -d`) and export the path as `${_DECKBUILD_TMP}`. BUT: You don't need to run `initTmp()` because a default tmp folder is always available.
 
 #### Usage
 
@@ -322,7 +322,7 @@ initTmp; touch ${_DECKBUILD_TMP}/foo.txt # create/use a custom tmp folder
 
 ## `installBashd`
 
-Initialize "bash.d" environment: bash.d folders store bash profile files. Profile files will be read (sourced) during container startup. BUT: Don't call this function directly, use addToBashd() instead.
+Initialize `bash.d` environment: bash.d folders store bash profile files. Profile files will be read (sourced) during container startup. BUT: Don't call this function directly, use `addToBashd()` instead.
 
 #### Usage
 
@@ -333,7 +333,7 @@ installBashd [<directory_path>]
 #### Arguments
 
 - directory_path
-    - bash.d parent folder, default is user's ${HOME}
+    - `bash.d` parent folder, default is user's `${HOME}`
 
 #### Examples
 
@@ -345,7 +345,7 @@ installBashd etc        # creates /etc/bash.d
 
 ## `installBasher`
 
-Install basher (https://github.com/basherpm/basher) environment (for specific user). BUT: Don't call this function directly, use installBasherPkg() instead.
+Install [basher](https://github.com/basherpm/basher) environment (for specific user). BUT: Don't call this function directly, use `installBasherPkg()` instead.
 
 #### Usage
 
@@ -362,7 +362,7 @@ sudof foo installBasher  # install basher for user foo
 
 ## `installBasherPkg`
 
-Install a basher package (see installBasher() for basher details).
+Install a [basher](https://github.com/basherpm/basher) package (see `installBasher()` for basher details).
 
 #### Usage
 
@@ -379,7 +379,7 @@ sudof foo installBasherPkg bar  # install bar package for user foo
 
 ## `installDebBatPkg`
 
-Install bat's (https://github.com/sharkdp/bat) latest version.
+Install [bat's](https://github.com/sharkdp/bat) latest version.
 
 #### Usage
 
@@ -389,7 +389,7 @@ installDebBatPkg
 
 ## `installDebPkgs`
 
-Install some useful debian packages ("apt-get install sudo curl ...").
+Install some useful debian packages (`apt-get install sudo curl ...`).
 
 #### Usage
 
@@ -399,7 +399,7 @@ installDebPkgs
 
 ## `installDirs`
 
-Simplify system's directory structure (e.g. merge /usr/local/bin and /usr/local/sbin).
+Simplify system's directory structure (e.g. merge `/usr/local/bin` and `/usr/local/sbin`).
 
 #### Usage
 
@@ -420,7 +420,7 @@ installFlexos [<directory_path>]
 #### Arguments
 
 - directory_path
-    - bash.d parent folder, see installBashd() for details
+    - `bash.d` parent folder, see `installBashd()` for details
 
 #### Examples
 
@@ -448,7 +448,7 @@ sudof foo installFlexosPy   # install packages for user foo
 
 ## `installFlexosSh`
 
-Install flexos basher packages (for specific user).
+Install flexos [basher](https://github.com/basherpm/basher) packages (for specific user).
 
 #### Usage
 
@@ -465,7 +465,7 @@ sudof foo installFlexosSh   # install packages for user foo
 
 ## `installPy`
 
-Install python environment (for specific user). BUT: Don't call this function directly, use installPyPkgs() instead.
+Install python environment (for specific user). BUT: Don't call this function directly, use `installPyPkgs()` instead.
 
 #### Usage
 
@@ -493,7 +493,7 @@ installPyPkgs <requirements_file>
 #### Examples
 
 ```shell
-installPyPkgs /tmp/root_reqs           # install packages for root 
+installPyPkgs /tmp/root_reqs           # install packages for root
 sudof foo installPyPkgs /tmp/foo_reqs  # install packages for user foo
 ```
 
@@ -510,7 +510,7 @@ installSudoUser <user> [<sudo_args>]
 #### Arguments
 
 - sudo_args
-    - sudo arguments, default is: "ALL=(ALL) NOPASSWD:ALL"
+    - `sudo` arguments, default are: `ALL=(ALL) NOPASSWD:ALL`
 
 #### Examples
 
@@ -542,9 +542,9 @@ installUser user user_id [user_home] [group] [group_id] [user_args] [group_args]
 - group_id
     - Group ID
 - user_args
-    - Additional arguments for "useradd" command
+    - Additional arguments for `useradd` command
 - group_args
-    - Additional arguments for "groupadd" command
+    - Additional arguments for `groupadd` command
 
 #### Examples
 
@@ -574,7 +574,7 @@ if is foo bar; then ...
 
 ## `isb`
 
-Boolean-check if value is true. Returns 1 (false) for "0", "false" and empty values. Returns 0 (true) for other values.
+Boolean-check if value is true. Returns `1` (`false`) for `0`, `false` and empty values. Returns `0` (`true`) for other values.
 
 #### Usage
 
@@ -596,7 +596,7 @@ isb "   " || ...   # false
 
 ## `isc`
 
-Check if command is runnable ("which <command>").
+Check if command is runnable (`which <command>`).
 
 #### Usage
 
@@ -613,7 +613,7 @@ if isc ps; then ...
 
 ## `isd`
 
-Check if file exists and is a directory ("test -d").
+Check if file exists and is a directory (`test -d`).
 
 #### Usage
 
@@ -630,7 +630,7 @@ if isd /tmp/bar; then ...
 
 ## `ise`
 
-Check if file exists ("test -e").
+Check if file exists (`test -e`).
 
 #### Usage
 
@@ -647,7 +647,7 @@ if ise /tmp/bar; then ...
 
 ## `isl`
 
-Check if file exists and is a link ("test -L").
+Check if file exists and is a link (`test -L`).
 
 #### Usage
 
@@ -681,7 +681,7 @@ if isn 2; then ...
 
 ## `isr`
 
-Check if file exists and is readable ("test -r").
+Check if file exists and is readable (`test -r`).
 
 #### Usage
 
@@ -698,7 +698,7 @@ if isr /tmp/bar; then ...
 
 ## `isx`
 
-Check if file exists and is executable ("test -x").
+Check if file exists and is executable (`test -x`).
 
 #### Usage
 
@@ -715,7 +715,7 @@ if isx /tmp/bar; then ...
 
 ## `isz`
 
-Check if value is empty ("test -z").
+Check if value is empty (`test -z`).
 
 #### Usage
 
@@ -762,7 +762,7 @@ redBold <message>
 
 ## `setUser`
 
-Configure user environment: Reads ${DECKBUILD_USER_CFG} and sets related environment variables (e.g. ${DECKBUILD_USER} and ${DECKBUILD_USER_ID}).
+Configure user environment: Reads `${DECKBUILD_USER_CFG}` and sets related environment variables (e.g. `${DECKBUILD_USER}` and `${DECKBUILD_USER_ID}`).
 
 #### Usage
 
@@ -783,7 +783,7 @@ stderr <message> [<format>]
 #### Arguments
 
 - format
-    - Format (passed to "echo"), e.g. "00;34" to print a blue message
+    - Format (passed to `echo`), e.g. `00;34` to print a blue message
 
 #### Examples
 
@@ -828,7 +828,7 @@ sudof foo myShellFunc arg1 arg2
 
 ## `upgradeDebPkgs`
 
-Upgrade all debian packages ("apt-get upgrade").
+Upgrade all debian packages (`apt-get upgrade`).
 
 #### Usage
 

@@ -1,13 +1,13 @@
 
 clearBasher() {
-  ##D Clear basher environment ("unset BASHER_*").
+  ##D Clear basher environment (`unset BASHER_*`).
   unset $(env | grep -E ^BASHER_ | sed "s@=.*\$@@")
 }
 
 installBasher() {
-  ##D Install basher (https://github.com/basherpm/basher) environment
+  ##D Install [basher](https://github.com/basherpm/basher) environment
   ##D (for specific user).
-  ##D BUT: Don't call this function directly, use installBasherPkg() instead.
+  ##D BUT: Don't call this function directly, use `installBasherPkg()` instead.
   ##E installBasher            # install basher for root
   ##E sudof foo installBasher  # install basher for user foo
   local dp=${HOME}/.basher
@@ -24,7 +24,8 @@ installBasher() {
 }
 
 installBasherPkg() {
-  ##D Install a basher package (see installBasher() for basher details).
+  ##D Install a [basher](https://github.com/basherpm/basher) package
+  ##D (see `installBasher()` for basher details).
   ##E installBasherPkg bar            # install bar package for root
   ##E sudof foo installBasherPkg bar  # install bar package for user foo
   local uri=${1}

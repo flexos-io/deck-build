@@ -17,7 +17,7 @@ is~() {
 
 isz() {
   ##C <value>
-  ##D Check if value is empty ("test -z").
+  ##D Check if value is empty (`test -z`).
   ##E isz "foo" || ...
   ##E if isz ""; then ...
   [ -z "${1:-}" ]
@@ -33,7 +33,7 @@ isz~() {
 
 ise() {
   ##C <path>
-  ##D Check if file exists ("test -e").
+  ##D Check if file exists (`test -e`).
   ##E ise /tmp/foo.txt || ...
   ##E if ise /tmp/bar; then ...
   ! isz~ "${1:-}" && [ -e "${1}" ]
@@ -41,7 +41,7 @@ ise() {
 
 isr() {
   ##C <path>
-  ##D Check if file exists and is readable ("test -r").
+  ##D Check if file exists and is readable (`test -r`).
   ##E isr /tmp/foo.txt || ...
   ##E if isr /tmp/bar; then ...
   ! isz~ "${1:-}" && [ -r "${1}" ]
@@ -49,7 +49,7 @@ isr() {
 
 isx() {
   ##C <path>
-  ##D Check if file exists and is executable ("test -x").
+  ##D Check if file exists and is executable (`test -x`).
   ##E isx /tmp/foo.sh || ...
   ##E if isx /tmp/bar; then ...
   ! isz~ "${1:-}" && [ -x "${1}" ]
@@ -57,7 +57,7 @@ isx() {
 
 isd() {
   ##C <path>
-  ##D Check if file exists and is a directory ("test -d").
+  ##D Check if file exists and is a directory (`test -d`).
   ##E isd /tmp/foo || ...
   ##E if isd /tmp/bar; then ...
   ! isz~ "${1:-}" && [ -d "${1}" ]
@@ -65,7 +65,7 @@ isd() {
 
 isl() {
   ##C <path>
-  ##D Check if file exists and is a link ("test -L").
+  ##D Check if file exists and is a link (`test -L`).
   ##E isl /tmp/foo.sh || ...
   ##E if isl /tmp/bar; then ...
   ! isz~ "${1:-}" && [ -L "${1}" ]
@@ -82,8 +82,8 @@ isn() {
 isb() {
   ##C <value>
   ##D Boolean-check if value is true.
-  ##D Returns 1 (false) for "0", "false" and empty values.
-  ##D Returns 0 (true) for other values.
+  ##D Returns `1` (`false`) for `0`, `false` and empty values.
+  ##D Returns `0` (`true`) for other values.
   ##E isb true || ...    # true
   ##E isb foo || ...     # true
   ##E if isb 1; then ... # true
@@ -98,7 +98,7 @@ isb() {
 
 isc() {
   ##C <command>
-  ##D Check if command is runnable ("which <command>").
+  ##D Check if command is runnable (`which <command>`).
   ##E isc ls || ...
   ##E if isc ps; then ...
   which ${1} >/dev/null 2>&1

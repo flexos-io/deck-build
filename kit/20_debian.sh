@@ -1,15 +1,15 @@
 
 aptInstall() {
   ##C <packages>
-  ##D Install debian packages ("apt-get install").
+  ##D Install debian packages (`apt-get install`).
   ##E aptInstall curl wget
   apt-get -y -f --no-install-recommends install ${*}
 }
 
 initDebPkgs() {
-  ##D Update debian package repository if necessary ("apt-get update").
-  ##D Necessary means: ${_DECKBUILD_DEB_REPO_INIT} is not set
-  ##D (initDebPkgs() sets ${_DECKBUILD_DEB_REPO_INIT} after running).
+  ##D Update debian package repository if necessary (`apt-get update`).
+  ##D Necessary means: `${_DECKBUILD_DEB_REPO_INIT}` is not set
+  ##D (`initDebPkgs()` sets `${_DECKBUILD_DEB_REPO_INIT}` after running).
   ##E unset ${_DECKBUILD_DEB_REPO_INIT}; initDebPkgs  # force action
   if ! isb "${_DECKBUILD_DEB_REPO_INIT:-}"; then
     yellow "Initializing package repository"
@@ -20,8 +20,8 @@ initDebPkgs() {
 
 cleanDebPkgs() {
   ##C [<delete_files>]
-  ##D Clean debian package repository ("apt-get autoremove").
-  ##A delete_files = Clear also /var/lib/apt/lists/* if set to "true" or "1"
+  ##D Clean debian package repository (`apt-get autoremove`).
+  ##A delete_files = Clear also `/var/lib/apt/lists/*` if set to `true` or `1`
   ##E cleanDebPkgs true
   local noFiles=${1:-1}
   yellow "Cleaning and checking packages"
@@ -32,7 +32,7 @@ cleanDebPkgs() {
 }
 
 installDebBatPkg() {
-  ##D Install bat's (https://github.com/sharkdp/bat) latest version.
+  ##D Install [bat's](https://github.com/sharkdp/bat) latest version.
   initDebPkgs
   yellow "Installing bat"
   getGitHubLatest sharkdp/bat
@@ -46,14 +46,14 @@ installDebBatPkg() {
 }
 
 upgradeDebPkgs() {
-  ##D Upgrade all debian packages ("apt-get upgrade").
+  ##D Upgrade all debian packages (`apt-get upgrade`).
   initDebPkgs
   yellow "Upgrading packages"
   apt-get -y --no-install-recommends upgrade || die "Upgrading packages failed"
 }
 
 installDebPkgs() {
-  ##D Install some useful debian packages ("apt-get install sudo curl ...").
+  ##D Install some useful debian packages (`apt-get install sudo curl ...`).
   initDebPkgs
   yellow "Installing packages"
   apt-get -y --no-install-recommends install \

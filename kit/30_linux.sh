@@ -1,8 +1,8 @@
 
 setUser() {
   ##D Configure user environment:
-  ##D Reads ${DECKBUILD_USER_CFG} and sets related environment variables
-  ##D (e.g. ${DECKBUILD_USER} and ${DECKBUILD_USER_ID}).
+  ##D Reads `${DECKBUILD_USER_CFG}` and sets related environment variables
+  ##D (e.g. `${DECKBUILD_USER}` and `${DECKBUILD_USER_ID}`).
   local userCfg="${DECKBUILD_USER_CFG:-}" # user:uid:sudoYesNo[:home:group:gid]
   local userColons=${userCfg//[^:]}
   local emsg="\$DECKBUILD_USER_CFG is invalid"
@@ -35,8 +35,8 @@ installUser() {
   ##A user_home = Path to user's home directory
   ##A group = Group name
   ##A group_id = Group ID
-  ##A user_args = Additional arguments for "useradd" command
-  ##A group_args = Additional arguments for "groupadd" command
+  ##A user_args = Additional arguments for `useradd` command
+  ##A group_args = Additional arguments for `groupadd` command
   ##E installUser foo 1001
   ##E installUser foo 1001 /home/user/foo
   ##E installUser foo 1001 /home/foo bar 2002
@@ -72,7 +72,7 @@ installUser() {
 installSudoUser() {
   ##C <user> [<sudo_args>]
   ##D Enable sudo for given user.
-  ##A sudo_args = sudo arguments, default is: "ALL=(ALL) NOPASSWD:ALL"
+  ##A sudo_args = `sudo` arguments, default are: `ALL=(ALL) NOPASSWD:ALL`
   ##E installSudoUser foo
   ##E setUser; installSudoUser ${DECKBUILD_USER}
   local user=${1}
@@ -86,11 +86,11 @@ installSudoUser() {
 
 installBashd() {
   ##C [<directory_path>]
-  ##D Initialize "bash.d" environment:
+  ##D Initialize `bash.d` environment:
   ##D bash.d folders store bash profile files.
   ##D Profile files will be read (sourced) during container startup.
-  ##D BUT: Don't call this function directly, use addToBashd() instead.
-  ##A directory_path = bash.d parent folder, default is user's ${HOME}
+  ##D BUT: Don't call this function directly, use `addToBashd()` instead.
+  ##A directory_path = `bash.d` parent folder, default is user's `${HOME}`
   ##E installBashd            # creates /root/.bash.d
   ##E sudof foo installBashd  # creates /home/foo/.bash.d
   ##E installBashd etc        # creates /etc/bash.d
@@ -115,10 +115,10 @@ installBashd() {
 
 addToBashd() {
   ##C <file_path> [<directory_path>]
-  ##D Add and read (source) a "bash.d" profile file
-  ##D (see installBashd() for bash.d details).
+  ##D Add and read (source) a `bash.d` profile file
+  ##D (see `installBashd()` for `bash.d` details).
   ##A file_path = Path to profile file
-  ##A directory_path = bash.d parent folder, see installBashd() for details
+  ##A directory_path = `bash.d` parent folder, see `installBashd()` for details
   ##E addToBashd /tmp/bar            # creates /root/.bash.d/bar
   ##E addToBashd /tmp/bar etc        # creates /etc/bash.d/bar
   ##E sudof foo addToBashd /tmp/bar  # creates /home/foo/.bash.d/bar
@@ -135,7 +135,7 @@ addToBashd() {
 
 installDirs() {
   ##D Simplify system's directory structure
-  ##D (e.g. merge /usr/local/bin and /usr/local/sbin).
+  ##D (e.g. merge `/usr/local/bin` and `/usr/local/sbin`).
   yellow "Optimizing /usr/local/ and /opt/"
   mkdir -p -m 755 /usr/local/bin /usr/local/src
   mv /opt/bin/* /usr/local/bin/ 2>/dev/null || :

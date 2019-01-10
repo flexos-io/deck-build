@@ -2,7 +2,7 @@
 stderr() {
   ##C <message> [<format>]
   ##D Print a message to stderr.
-  ##A format = Format (passed to "echo"), e.g. "00;34" to print a blue message
+  ##A format = Format (passed to `echo`), e.g. `00;34` to print a blue message
   ##E stderr "Hello World"
   ##E stderr "Hello World" "00;34"
   local msg="${1}"

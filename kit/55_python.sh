@@ -1,7 +1,7 @@
 
 installPy() {
   ##D Install python environment (for specific user).
-  ##D BUT: Don't call this function directly, use installPyPkgs() instead.
+  ##D BUT: Don't call this function directly, use `installPyPkgs()` instead.
   ##E installPy             # creates /root/.config/pip/pip.conf
   ##E sudof foo installPy   # creates /home/foo/.config/pip/pip.conf
   export _DECKBUILD_PYTHON_REQS=${HOME}/.config/python/requirements
@@ -21,7 +21,7 @@ installPyPkgs() {
   ##C <requirements_file>
   ##D Install python packages (for specific user)
   ##D of given pip-requirements file.
-  ##E installPyPkgs /tmp/root_reqs           # install packages for root 
+  ##E installPyPkgs /tmp/root_reqs           # install packages for root
   ##E sudof foo installPyPkgs /tmp/foo_reqs  # install packages for user foo
   local srcFp=${1}
   installPy

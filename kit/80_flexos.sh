@@ -2,7 +2,7 @@
 installFlexos() {
   ##C [<directory_path>]
   ##D Install flexos environment (for specific user).
-  ##A directory_path = bash.d parent folder, see installBashd() for details
+  ##A directory_path = `bash.d` parent folder, see `installBashd()` for details
   ##E installFlexos            # adds flexos files to root's bash.d folder
   ##E sudo foo installFlexos   # adds flexos files to user foo's bash.d folder
   local dp="${1:-}"
@@ -17,7 +17,8 @@ installFlexos() {
 }
 
 installFlexosSh() {
-  ##D Install flexos basher packages (for specific user).
+  ##D Install flexos [basher](https://github.com/basherpm/basher)
+  ##D packages (for specific user).
   ##E installFlexosSh             # install packages for root
   ##E sudof foo installFlexosSh   # install packages for user foo
   installBasherPkg flexos-io/flexos-sh-base
