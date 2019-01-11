@@ -11,6 +11,7 @@
 - [`error`](#error)
 - [`getGitHubLatest`](#getGitHubLatest)
 - [`getUserDp`](#getUserDp)
+- [`getUserHome`](#getUserHome)
 - [`green`](#green)
 - [`hasBuildArg`](#hasBuildArg)
 - [`initDebPkgs`](#initDebPkgs)
@@ -241,7 +242,7 @@ getGitHubLatest foobar
 
 ## `getUserDp`
 
-Get user's home directory.
+Get user's home directory path.
 
 #### Usage
 
@@ -253,6 +254,22 @@ getUserDp <user>
 
 ```shell
 getUserDp foo
+```
+
+## `getUserHome`
+
+Get user's home directory path (alias for `getUserDp()`).
+
+#### Usage
+
+```shell
+getUserHome <user>
+```
+
+#### Examples
+
+```shell
+getUserHome foo
 ```
 
 ## `green`

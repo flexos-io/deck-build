@@ -56,10 +56,17 @@ sudof() {
 
 getUserDp() {
   ##C <user>
-  ##D Get user's home directory.
+  ##D Get user's home directory path.
   ##E getUserDp foo
   local user=${1}
   eval echo "~${user}"
+}
+
+getUserHome() {
+  ##C <user>
+  ##D Get user's home directory path (alias for `getUserDp()`).
+  ##E getUserHome foo
+  getUserDp ${1}
 }
 
 dload() {
