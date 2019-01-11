@@ -69,7 +69,7 @@ initTmp() {
 }
 
 usage() {
-  local tag=flexos/py3:0.1.0
+  local tag=flexos/py:0.1.0
   stderr ""
   stderr "  ${_myFn} -t <image:tag> -p <plan> [-P [-L]] [-F] [-- <args>]"
   stderr "    -t image:tag = docker image name and tag"
@@ -80,10 +80,10 @@ usage() {
   stderr "    -- <args>    = additional arguments for 'docker build'"
   stderr ""
   stderr "  examples:"
-  stderr "    ${_myFn} -t ${tag} -p py3_0.1.0"
-  stderr "    ${_myFn} -t ${tag} -p ./py3 -P"
+  stderr "    ${_myFn} -t ${tag} -p ./py"
+  stderr "    ${_myFn} -t ${tag} -p ./py -P"
   stderr "    ${_myFn} -t ${tag} -p github.com/... -P -L"
-  stderr "    ${_myFn} -t ${tag} -p ./py3 -- --no-cache"
+  stderr "    ${_myFn} -t ${tag} -p ./py -- --no-cache"
   stderr ""
   stderr "  version: ${_version}"
   stderr ""
