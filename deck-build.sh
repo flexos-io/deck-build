@@ -111,14 +111,14 @@ checkIntegrity() {
   local planDp=${1}
   local dckrFp=${2}
   # check for the following Dockerfile lines:
-  #  ADD https://github.com/flexos-io/deck-build/raw/master/kit/kit.tgz ${DECKBUILD_PLANT}/
+  #  ADD https://github.com/flexos-io/deck-build/releases/download/x.x.x/kit.tgz ${DECKBUILD_PLANT}/
   #  RUN cd ${DECKBUILD_PLANT} && tar --no-same-owner -zxpf kit.tgz && rm kit.tgz
   #  RUN tar --no-same-owner -zxpf ${DECKBUILD_PLANT}/kit.tgz -C ${DECKBUILD_PLANT} && rm ${DECKBUILD_PLANT}/kit.tgz
   #  COPY .kit ${DECKBUILD_KIT}
   if grep -q -P '^\s*(COPY|ADD)\s+\.kit\s+\${?DECKBUILD_KIT}?\s*$' ${dckrFp}; then
     if grep -q -P '^\s*ADD\s+https://github.com/.+/kit\.tgz\s+\${?DECKBUILD_PLANT}?/(kit\.tgz)?\s*$' ${dckrFp} || \
-       grep -q -P '^\s*RUN\s+.+\${?DECKBUILD_PLANT}?.+\s+tar\s+.+\s+kit.tgz(\s+.+)?\s*$' ${dckrFp} || \
-       grep -q -P '^\s*RUN\s+(.*\s+)?tar\s+.+\s\${?DECKBUILD_PLANT}?/kit.tgz(\s+.+)?\s*$' ${dckrFp}
+       grep -q -P '^\s*RUN\s+.+\${?DECKBUILD_PLANT}?.+\s+tar\s+.+\s+kit\.tgz(\s+.+)?\s*$' ${dckrFp} || \
+       grep -q -P '^\s*RUN\s+(.*\s+)?tar\s+.+\s\${?DECKBUILD_PLANT}?/kit\.tgz(\s+.+)?\s*$' ${dckrFp}
     then
       die "Dockerfile wants to COPY and download kit: Don't enable both. See https://github.com/flexos-io/doc/wiki/deck_build#Configuration-Define-The-Kit"
     fi
