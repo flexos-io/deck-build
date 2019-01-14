@@ -22,6 +22,7 @@ installFlexosSh() {
   ##E installFlexosSh             # install packages for root
   ##E sudof foo installFlexosSh   # install packages for user foo
   installBasherPkg flexos-io/flexos-sh-base
+  installBasherPkg flexos-io/flexos-sh-hello
   installBasherPkg flexos-io/flexos-sh-tool
 }
 

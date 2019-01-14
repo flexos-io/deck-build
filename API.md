@@ -45,7 +45,6 @@
 - [`setUser`](#setUser)
 - [`stderr`](#stderr)
 - [`sudoc`](#sudoc)
-- [`sudof`](#sudof)
 - [`upgradeDebPkgs`](#upgradeDebPkgs)
 - [`warn`](#warn)
 - [`white`](#white)
@@ -258,18 +257,12 @@ getUserDp foo
 
 ## `getUserHome`
 
-Get user's home directory path (alias for `getUserDp()`).
+Alias for `getUserDp()`.
 
 #### Usage
 
 ```shell
 getUserHome <user>
-```
-
-#### Examples
-
-```shell
-getUserHome foo
 ```
 
 ## `green`
@@ -591,7 +584,7 @@ if is foo bar; then ...
 
 ## `isb`
 
-Boolean-check if value is true. Returns `1` (`false`) for `0`, `false` and empty values. Returns `0` (`true`) for other values.
+Boolean check. Returns `1` (`false`) for `0`, `false` and empty values. Returns `0` (`true`) for other values.
 
 #### Usage
 
@@ -811,12 +804,12 @@ stderr "Hello World" "00;34"
 
 ## `sudoc`
 
-Run command as given user.
+Run command as given user (`sudo ...`). Run shell function as given user (`sudo ...`).
 
 #### Usage
 
 ```shell
-sudoc <user> <command>
+sudoc <user> <function> [<function_arguments>]
 ```
 
 #### Examples
@@ -824,21 +817,6 @@ sudoc <user> <command>
 ```shell
 sudoc foo ls
 sudoc foo ls /home/foo
-```
-
-## `sudof`
-
-Run shell function as given user.
-
-#### Usage
-
-```shell
-sudof <user> <command>
-```
-
-#### Examples
-
-```shell
 sudof foo myShellFunc
 sudof foo myShellFunc arg1 arg2
 ```
