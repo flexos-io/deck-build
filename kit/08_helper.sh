@@ -29,31 +29,6 @@ hasBuildArg() {
   is~ "${sep}${DECKBUILD_ARGS:-}${sep}" "${sep}${arg}${sep}"
 }
 
-sudoc() {
-  ##C <user> <command>
-  ##D Run command as given user.
-  ##E sudoc foo ls
-  ##E sudoc foo ls /home/foo
-  local args="${*}"
-  local user="${args%% *}"
-  local cmd="${args#* }" # command with arguments
-  isc sudo || die "Command 'sudo' not found"
-  sudo HOME=$(getUserDp ${user}) -n -u ${user} -E -- ${cmd}
-}
-
-sudof() {
-  ##C <user> <command>
-  ##D Run shell function as given user.
-  ##E sudof foo myShellFunc
-  ##E sudof foo myShellFunc arg1 arg2
-  local args="${*}"
-  local user="${args%% *}"
-  local func="${args#* }" # function with arguments
-  isc sudo || die "Command 'sudo' not found"
-  sudo HOME=$(getUserDp ${user}) USER=${user} LOGNAME=${user} USERNAME=${user} \
-    -n -u ${user} -E bash -c "$(declare -f); unset -f sudof; ${func}"
-}
-
 getUserDp() {
   ##C <user>
   ##D Get user's home directory path.
@@ -64,9 +39,33 @@ getUserDp() {
 
 getUserHome() {
   ##C <user>
-  ##D Get user's home directory path (alias for `getUserDp()`).
-  ##E getUserHome foo
+  ##D Alias for `getUserDp()`.
   getUserDp ${1}
+}
+
+sudoc() {
+  ##C <user> <command> [<command_arguments>]
+  ##D Run command as given user (`sudo ...`).
+  ##E sudoc foo ls
+  ##E sudoc foo ls /home/foo
+  local args="${*}"
+  local user="${args%% *}"
+  local cmd="${args#* }" # command with arguments
+  isc sudo || die "Command 'sudo' not found"
+  sudo HOME=$(getUserDp ${user}) USER=${user} LOGNAME=${user} USERNAME=${user} \
+    -n -u ${user} -E -- ${cmd}
+
+sudof() {
+  ##C <user> <function> [<function_arguments>]
+  ##D Run shell function as given user (`sudo ...`).
+  ##E sudof foo myShellFunc
+  ##E sudof foo myShellFunc arg1 arg2
+  local args="${*}"
+  local user="${args%% *}"
+  local func="${args#* }" # function with arguments
+  isc sudo || die "Command 'sudo' not found"
+  sudo HOME=$(getUserDp ${user}) USER=${user} LOGNAME=${user} USERNAME=${user} \
+    -n -u ${user} -E bash -c "$(declare -f); unset -f sudof; ${func}"
 }
 
 dload() {
