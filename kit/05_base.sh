@@ -81,7 +81,7 @@ isn() {
 
 isb() {
   ##C <value>
-  ##D Boolean-check if value is true.
+  ##D Boolean check.
   ##D Returns `1` (`false`) for `0`, `false` and empty values.
   ##D Returns `0` (`true`) for other values.
   ##E isb true || ...    # true
@@ -103,7 +103,6 @@ isc() {
   ##E if isc ps; then ...
   which ${1} >/dev/null 2>&1
 }
-##E if isc ps; then ...
 
 warn() {
   ##C <message>

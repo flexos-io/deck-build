@@ -10,7 +10,7 @@ stderr() {
   if [ -z "${fmt}" ]; then
     echo -e "${msg}" >&2
   else
-    stderr "\e[${fmt}m${msg}\e[00m"
+    echo -e "\e[${fmt}m${msg}\e[00m" >&2
   fi
 }
 
