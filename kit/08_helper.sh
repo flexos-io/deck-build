@@ -54,6 +54,7 @@ sudoc() {
   isc sudo || die "Command 'sudo' not found"
   sudo HOME=$(getUserDp ${user}) USER=${user} LOGNAME=${user} USERNAME=${user} \
     -n -u ${user} -E -- ${cmd}
+}
 
 sudof() {
   ##C <user> <function> [<function_arguments>]

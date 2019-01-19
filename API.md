@@ -45,6 +45,7 @@
 - [`setUser`](#setUser)
 - [`stderr`](#stderr)
 - [`sudoc`](#sudoc)
+- [`sudof`](#sudof)
 - [`upgradeDebPkgs`](#upgradeDebPkgs)
 - [`warn`](#warn)
 - [`white`](#white)
@@ -804,12 +805,12 @@ stderr "Hello World" "00;34"
 
 ## `sudoc`
 
-Run command as given user (`sudo ...`). Run shell function as given user (`sudo ...`).
+Run command as given user (`sudo ...`).
 
 #### Usage
 
 ```shell
-sudoc <user> <function> [<function_arguments>]
+sudoc <user> <command> [<command_arguments>]
 ```
 
 #### Examples
@@ -817,6 +818,21 @@ sudoc <user> <function> [<function_arguments>]
 ```shell
 sudoc foo ls
 sudoc foo ls /home/foo
+```
+
+## `sudof`
+
+Run shell function as given user (`sudo ...`).
+
+#### Usage
+
+```shell
+sudof <user> <function> [<function_arguments>]
+```
+
+#### Examples
+
+```shell
 sudof foo myShellFunc
 sudof foo myShellFunc arg1 arg2
 ```
