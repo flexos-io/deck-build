@@ -9,7 +9,7 @@ set -o pipefail
 _myFp=$(readlink -f "${0}")
 _myFn=$(basename "${_myFp}")
 _args0="${@}"
-_version=0.2.0
+_version=0.1.0
 
 stderr() {
   echo -e "${1}" >&2
