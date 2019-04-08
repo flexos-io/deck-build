@@ -48,6 +48,8 @@ installUser() {
   local gid=${5:-${uid}}
   local userArgs="${6:-}"
   local grpArgs="${7:-}"
+  ! isz "${user:-}" || \
+    die "User is not set: Do you forget to set \$DECKBUILD_USER_CFG?"
   if getent group ${grp} >/dev/null; then
     yellow "Skipping creating group ${grp}: Already exists"
   else
@@ -78,6 +80,8 @@ installSudoUser() {
   local user=${1}
   local args="${2:-ALL=(ALL) NOPASSWD:ALL}"
   local dp=/etc/sudoers.d
+  ! isz "${user:-}" || \
+    die "User is not set: Do you forget to set \$DECKBUILD_USER_CFG?"
   isd ${dp} || die "Opening ${dp}/ failed: Is 'sudo' installed?"
   yellow "Enabling sudo for ${user}"
   echo "${user} ${args}" > ${dp}/${user}
@@ -93,7 +97,7 @@ installBashd() {
   ##A directory_path = `bash.d` parent folder, default is user's `${HOME}`
   ##E installBashd            # creates /root/.bash.d
   ##E sudof foo installBashd  # creates /home/foo/.bash.d
-  ##E installBashd etc        # creates /etc/bash.d
+  ##E installBashd /etc       # creates /etc/bash.d
   local dp="${1:-}"
   if isz "${dp}"; then
     export _DECKBUILD_BASHD=${HOME}/.bash.d
@@ -120,7 +124,7 @@ addToBashd() {
   ##A file_path = Path to profile file
   ##A directory_path = `bash.d` parent folder, see `installBashd()` for details
   ##E addToBashd /tmp/bar            # creates /root/.bash.d/bar
-  ##E addToBashd /tmp/bar etc        # creates /etc/bash.d/bar
+  ##E addToBashd /tmp/bar /etc       # creates /etc/bash.d/bar
   ##E sudof foo addToBashd /tmp/bar  # creates /home/foo/.bash.d/bar
   ##E sudof foo addToBashd ${DECKBUILD_KIT_STOCK}/python/55_python.sh
   local srcFp="${1}"
@@ -131,6 +135,48 @@ addToBashd() {
     die "Adding ${srcFp} to ${_DECKBUILD_BASHD}/ failed"
   yellow "Sourcing ${dstFp}"
   . ${dstFp} || die "Sourcing ${dstFp} failed"
+}
+
+sourceBashdFile() {
+  ##C <file_name> [<directory_path>]
+  ##D Read (source) a `bash.d` profile file
+  ##D (see `installBashd()` for `bash.d` details).
+  ##A file_name = Profile file name
+  ##A directory_path = `bash.d` parent folder, see `installBashd()` for details
+  ##E sourceBashdFile bar            # sources /root/.bash.d/bar
+  ##E sourceBashdFile bar /etc       # sources /etc/bash.d/bar
+  ##E sudof foo sourceBashdFile bar  # sources /home/foo/.bash.d/bar
+  local fn="${1}"
+  local dp="${2:-}"
+  if isz "${dp}"; then
+    dp=${HOME}/.bash.d
+  else
+    dp=${dp}/bash.d
+  fi
+  local fp=${dp}/${fn}
+  yellow "Sourcing ${fp}"
+  . ${fp} || die "Sourcing ${fp} failed"
+}
+
+sourceBashdFiles() {
+  ##C [<directory_path>]
+  ##D Read (source) all `bash.d` profile files
+  ##D (see `installBashd()` for `bash.d` details).
+  ##A directory_path = `bash.d` parent folder, see `installBashd()` for details
+  ##E sourceBashdFiles               # sources /root/.bash.d/*
+  ##E sourceBashdFiles bar /etc      # sources /etc/bash.d/*
+  ##E sudof foo sourceBashdFile bar  # sources /home/foo/.bash.d/*
+  local dp="${1:-}"
+  if isz "${dp}"; then
+    dp=${HOME}/.bash.d
+  else
+    dp=${dp}/bash.d
+  fi
+  yellow "Sourcing ${dp}/"
+  local fp=""
+  for fp in ${dp}/*.sh; do
+    . ${fp} || die "Sourcing ${fp} failed"
+  done
 }
 
 installDirs() {
