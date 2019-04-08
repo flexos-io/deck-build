@@ -43,6 +43,8 @@
 - [`red`](#red)
 - [`redBold`](#redBold)
 - [`setUser`](#setUser)
+- [`sourceBashdFile`](#sourceBashdFile)
+- [`sourceBashdFiles`](#sourceBashdFiles)
 - [`stderr`](#stderr)
 - [`sudoc`](#sudoc)
 - [`sudof`](#sudof)
@@ -74,7 +76,7 @@ addToBashd <file_path> [<directory_path>]
 
 ```shell
 addToBashd /tmp/bar            # creates /root/.bash.d/bar
-addToBashd /tmp/bar etc        # creates /etc/bash.d/bar
+addToBashd /tmp/bar /etc       # creates /etc/bash.d/bar
 sudof foo addToBashd /tmp/bar  # creates /home/foo/.bash.d/bar
 sudof foo addToBashd ${DECKBUILD_KIT_STOCK}/python/55_python.sh
 ```
@@ -351,7 +353,7 @@ installBashd [<directory_path>]
 ```shell
 installBashd            # creates /root/.bash.d
 sudof foo installBashd  # creates /home/foo/.bash.d
-installBashd etc        # creates /etc/bash.d
+installBashd /etc       # creates /etc/bash.d
 ```
 
 ## `installBasher`
@@ -400,13 +402,18 @@ installDebBatPkg
 
 ## `installDebPkgs`
 
-Install some useful debian packages (`apt-get install sudo curl ...`).
+Install useful debian packages (`apt-get install sudo curl ...`).
 
 #### Usage
 
 ```shell
-installDebPkgs
+installDebPkgs [<mode>]
 ```
+
+#### Arguments
+
+- mode
+    - `slim` to install some packages, `fat` to install more packages, default is `slim`
 
 ## `installDirs`
 
@@ -779,6 +786,54 @@ Configure user environment: Reads `${DECKBUILD_USER_CFG}` and sets related envir
 
 ```shell
 setUser
+```
+
+## `sourceBashdFile`
+
+Read (source) a `bash.d` profile file (see `installBashd()` for `bash.d` details).
+
+#### Usage
+
+```shell
+sourceBashdFile <file_name> [<directory_path>]
+```
+
+#### Arguments
+
+- file_name
+    - Profile file name
+- directory_path
+    - `bash.d` parent folder, see `installBashd()` for details
+
+#### Examples
+
+```shell
+sourceBashdFile bar            # sources /root/.bash.d/bar
+sourceBashdFile bar /etc       # sources /etc/bash.d/bar
+sudof foo sourceBashdFile bar  # sources /home/foo/.bash.d/bar
+```
+
+## `sourceBashdFiles`
+
+Read (source) all `bash.d` profile files (see `installBashd()` for `bash.d` details).
+
+#### Usage
+
+```shell
+sourceBashdFiles [<directory_path>]
+```
+
+#### Arguments
+
+- directory_path
+    - `bash.d` parent folder, see `installBashd()` for details
+
+#### Examples
+
+```shell
+sourceBashdFiles               # sources /root/.bash.d/*
+sourceBashdFiles bar /etc      # sources /etc/bash.d/*
+sudof foo sourceBashdFile bar  # sources /home/foo/.bash.d/*
 ```
 
 ## `stderr`

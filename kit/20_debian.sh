@@ -26,8 +26,7 @@ cleanDebPkgs() {
   local noFiles=${1:-1}
   yellow "Cleaning and checking packages"
   apt-get -y autoremove || die "Cleaning packages failed"
-  apt-get -y -f --no-install-recommends install || \
-    die "Checking packages failed"
+  aptInstall || die "Checking packages failed"
   isb ${noFiles} || rm -rf /var/lib/apt/lists/*
 }
 
@@ -53,55 +52,61 @@ upgradeDebPkgs() {
 }
 
 installDebPkgs() {
-  ##D Install some useful debian packages (`apt-get install sudo curl ...`).
+  ##C [<mode>]
+  ##D Install useful debian packages (`apt-get install sudo curl ...`).
+  ##A mode = `slim` to install some packages, `fat` to install more packages, default is `slim`
+  local mode="${1:-slim}"
   initDebPkgs
-  yellow "Installing packages"
-  apt-get -y --no-install-recommends install \
+
+  yellow "Installing packages (slim)"
+  aptInstall \
     apt-transport-https \
     apt-utils \
-    bind9-host \
     build-essential \
     ca-certificates \
     curl \
-    dnsutils \
-    ethtool \
     file \
     git \
     gnupg \
     inotify-tools \
-    iputils-arping \
     iputils-ping \
     jq \
     less \
-    libpython-dev \
-    libpython3-dev \
     libxml2-utils \
     lsb-release \
     man \
     nano \
     net-tools \
-    netcat \
-    ngrep \
-    nmap \
-    openssh-client \
     procps \
     psmisc \
-    pwgen \
-    python-dev \
     python-pip \
     python-yaml \
-    python3-dev \
     python3-pip \
     python3-yaml \
     rsync \
     screen \
     software-properties-common \
     ssl-cert \
-    strace \
     sudo \
-    tcpdump \
     vim \
     w3m \
     wget || \
   die "Installing packages failed"
+
+  if is ${mode} fat; then
+    yellow "Installing packages (fat)"
+    aptInstall \
+      bind9-host \
+      dnsutils \
+      libpython-dev \
+      libpython3-dev \
+      netcat \
+      nmap \
+      openssh-client \
+      pwgen \
+      python-dev \
+      python3-dev || \
+    die "Installing packages failed"
+  fi
 }
+
