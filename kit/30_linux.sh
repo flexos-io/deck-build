@@ -163,9 +163,9 @@ sourceBashdFiles() {
   ##D Read (source) all `bash.d` profile files
   ##D (see `installBashd()` for `bash.d` details).
   ##A directory_path = `bash.d` parent folder, see `installBashd()` for details
-  ##E sourceBashdFiles               # sources /root/.bash.d/*
-  ##E sourceBashdFiles bar /etc      # sources /etc/bash.d/*
-  ##E sudof foo sourceBashdFile bar  # sources /home/foo/.bash.d/*
+  ##E sourceBashdFiles           # sources /root/.bash.d/*
+  ##E sourceBashdFiles /etc      # sources /etc/bash.d/*
+  ##E sudof foo sourceBashdFile  # sources /home/foo/.bash.d/*
   local dp="${1:-}"
   if isz "${dp}"; then
     dp=${HOME}/.bash.d

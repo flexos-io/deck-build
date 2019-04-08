@@ -831,9 +831,9 @@ sourceBashdFiles [<directory_path>]
 #### Examples
 
 ```shell
-sourceBashdFiles               # sources /root/.bash.d/*
-sourceBashdFiles bar /etc      # sources /etc/bash.d/*
-sudof foo sourceBashdFile bar  # sources /home/foo/.bash.d/*
+sourceBashdFiles           # sources /root/.bash.d/*
+sourceBashdFiles /etc      # sources /etc/bash.d/*
+sudof foo sourceBashdFile  # sources /home/foo/.bash.d/*
 ```
 
 ## `stderr`
