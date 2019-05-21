@@ -1,15 +1,9 @@
-#!/bin/bash
+#!/bin/bash -e
 
-set -o errtrace
-set -o nounset
-set -o errexit
-set -o pipefail
-#set -o posix
-
-_myFp=$(readlink -f "${0}")
-_myFn=$(basename "${_myFp}")
-_args0="${@}"
-_version=0.1.0
+MY_FP=$(readlink -f "${0}")
+MY_FN=$(basename "${MY_FP}")
+MY_ARGS="${*}"
+MY_VERSION=0.2.0
 
 stderr() {
   echo -e "${1}" >&2
@@ -60,33 +54,35 @@ isb() {
 
 clean() {
   yellow "Cleaning"
-  isz "${_cleanFps:-}" || rm -rf ${_cleanFps}
-  isz "${_tmpDp:-}" || rm -rf ${_tmpDp}
+  isz "${CLEAN_FPS:-}" || rm -rf ${CLEAN_FPS}
+  isz "${TMP_DP:-}" || rm -rf ${TMP_DP}
 }
 
 initTmp() {
-  export _tmpDp=$(mktemp -d)
+  export TMP_DP=$(mktemp -d)
 }
 
 usage() {
   local tag=flexos/py:0.1.0
   stderr ""
-  stderr "  ${_myFn} -t <image:tag> -p <plan> [-P [-L]] [-F] [-- <args>]"
-  stderr "    -t image:tag = docker image name and tag"
-  stderr "    -p plan      = plan's directory or git URI"
-  stderr "    -P           = push image to docker-hub"
-  stderr "    -L           = add 'latest' tag to docker-hub (needs -P)"
-  stderr "    -F           = force actions"
-  stderr "    -- <args>    = additional arguments for 'docker build'"
+  stderr "  ${MY_FN} -t <image:tag> -p <plan> [-P [-L]] [-F] [-- <args>]"
+  stderr "    -t <image:tag> = Docker image name and tag"
+  stderr "    -p <plan>      = Plan's directory or git URI"
+  stderr "    -P             = Push image to docker-hub"
+  stderr "    -L             = Add 'latest' tag to docker-hub (needs -P)"
+  stderr "    -F             = Force actions"
+  stderr "    -s <stage>     = Build stage: Use Dockerfile.<stage> as input"
+  stderr "    -- <args>      = Additional arguments for 'docker build'"
   stderr ""
-  stderr "  examples:"
-  stderr "    ${_myFn} -t ${tag} -p ./py"
-  stderr "    ${_myFn} -t ${tag} -p ./py -P"
-  stderr "    ${_myFn} -t ${tag} -p ./py -P -L"
-  stderr "    ${_myFn} -t ${tag} -p github.com/flexos-io/deck-plan.git#:py"
-  stderr "    ${_myFn} -t ${tag} -p ./py -- --no-cache"
+  stderr "  Examples:"
+  stderr "    ${MY_FN} -t ${tag} -p ./py"
+  stderr "    ${MY_FN} -t ${tag} -p ./py -s dev"
+  stderr "    ${MY_FN} -t ${tag} -p ./py -P"
+  stderr "    ${MY_FN} -t ${tag} -p ./py -P -L"
+  stderr "    ${MY_FN} -t ${tag} -p github.com/flexos-io/deck-plan.git#:py"
+  stderr "    ${MY_FN} -t ${tag} -p ./py -- --progress=plain --no-cache"
   stderr ""
-  stderr "  version: ${_version}"
+  stderr "  Version: ${MY_VERSION}"
   stderr ""
   exit 2
 }
@@ -123,7 +119,7 @@ checkIntegrity() {
     then
       die "Dockerfile wants to COPY and download kit: Don't enable both. See https://github.com/flexos-io/doc/wiki/deck_build#Configuration-Define-The-Kit"
     fi
-    isz "${DECKBUILD_KIT_SRC:-}" && \
+    ! isz "${DECKBUILD_KIT_SRC:-}" || \
       die "Dockerfile wants to COPY kit but \${DECKBUILD_KIT_SRC} is not set. See https://github.com/flexos-io/doc/wiki/deck_build#Configuration-Define-The-Kit"
   fi
   if grep -q -P -r --include='*.sh' '^\s*setUser(\s*$|\s*#)' ${planDp} && \
@@ -134,21 +130,23 @@ checkIntegrity() {
 }
 
 buildPlant() {
-  ! isz "${_planArg:-}" || usage
-  ! isz "${_imgTagArg:-}" || usage
+  ! isz "${ARG_PLAN:-}" || usage
+  ! isz "${ARG_IMG_TAG:-}" || usage
   trap clean EXIT
-  export DECKBUILD_IMG=${_imgTagArg}
+  export DECKBUILD_IMG=${ARG_IMG_TAG}           # e.g. flexos/foo:0.1.0
+  export DECKBUILD_RELEASE=${ARG_IMG_TAG##*/}   # e.g.        foo:0.1.0
   sourceCfgs
-  if isUri "${_planArg:-}"; then
-    yellow "Plan: ${_planArg}"
+  if isUri "${ARG_PLAN:-}"; then
+    yellow "Plan: ${ARG_PLAN}"
     export DECKBUILD_PLAN_URI=1
-    export DECKBUILD_PLAN=${_planArg}
+    export DECKBUILD_PLAN=${ARG_PLAN}
     export DECKBUILD_PLANT=/tmp
   else
-    local planDp=$(readlink -f ${_planArg})
+    local planDp=$(readlink -f ${ARG_PLAN})
     isd ${planDp} || die "Opening ${planDp}/ failed"
-    dckrFp=${planDp}/Dockerfile
-    ise ${dckrFp} || die "Opening ${_dckrFp} failed"
+    local dckrFp=${planDp}/Dockerfile
+    isz "${ARG_BUILD_STAGE:-}" || dckrFp+=".${ARG_BUILD_STAGE}"
+    ise ${dckrFp} || die "Opening ${dckrFp} failed"
     checkIntegrity ${planDp} ${dckrFp}
     yellow "Plan: ${planDp}"
     if isx ${planDp}/build.sh; then
@@ -158,7 +156,7 @@ buildPlant() {
     if isb ${DECKBUILD_TMP_PLANT:-false}; then
       initTmp
       yellow "DECKBUILD_TMP_PLANT is enabled: Copying ${planDp}/ to tmp folder"
-      local plantDp=${_tmpDp}/plant
+      local plantDp=${TMP_DP}/plant
       cp -a ${planDp} ${plantDp}
     else
       local plantDp=${planDp}
@@ -169,12 +167,13 @@ buildPlant() {
       yellow "Kit: ${kitDp}"
       local plantKitDp=${plantDp}/.kit
       rm -rf ${plantKitDp}
-      _cleanFps+=" ${plantKitDp}"
+      CLEAN_FPS+=" ${plantKitDp}"
       cp -a ${kitDp} ${plantKitDp}
     fi
     export DECKBUILD_PLAN_URI=0
     export DECKBUILD_PLAN=${planDp}
     export DECKBUILD_PLANT=${plantDp}
+    export DECKBUILD_DOCKERFILE=${dckrFp##*/}
   fi
 }
 
@@ -185,9 +184,14 @@ buildImg() {
   if isb ${DECKBUILD_PLAN_URI}; then
     local target=${DECKBUILD_PLAN}
   else
+    local dckrFpArg=""
+    if ! is ${DECKBUILD_DOCKERFILE} Dockerfile; then
+      yellow "Build file is ${DECKBUILD_DOCKERFILE}"
+      dckrFpArg="-f ${DECKBUILD_DOCKERFILE}"
+    fi
     local buildShFp=${plantDp}/build.sh
     if isx ${buildShFp}; then
-      if isb ${_skipBuildShArg:-}; then
+      if isb ${ARG_SKIP_BUILDSH:-}; then
         yellow "Skipping build.sh"
       else
         yellow "Running build.sh"
@@ -199,10 +203,11 @@ buildImg() {
   local dp=/usr/local/flexos/deck/build
   export DECKBUILD_USER_CFG="${DECKBUILD_USER_CFG:-}"
   export DECKBUILD_ARGS="${DECKBUILD_ARGS:-}"
-  docker build --tag ${DECKBUILD_IMG} ${_args2} \
+  docker build ${dckrFpArg} --tag ${DECKBUILD_IMG} ${MY_ARGS2} \
       --build-arg DECKBUILD_PLANT=${dp} \
       --build-arg DECKBUILD_KIT=${dp}/kit \
-      --build-arg DECKBUILD_USER_CFG=${DECKBUILD_USER_CFG:-} \
+      --build-arg DECKBUILD_RELEASE=${DECKBUILD_RELEASE:-} \
+      --build-arg DECKBUILD_USER_CFG="${DECKBUILD_USER_CFG:-}" \
       --build-arg DECKBUILD_ARGS="${DECKBUILD_ARGS:-}" \
     ${target} || die "Building failed"
 }
@@ -213,7 +218,7 @@ pushImg() {
   docker login || die "Login to docker-hub failed"
   yellow "Pushing ${imgTag}"
   docker push ${imgTag} || die "Pushing to docker-hub failed"
-  if isb "${_latestArg:-}"; then
+  if isb "${ARG_LATEST:-}"; then
     imgLatestTag=${imgTag%:*}:latest
     yellow "Pushing ${imgLatestTag}"
     docker tag ${imgTag} ${imgLatestTag}
@@ -222,36 +227,37 @@ pushImg() {
 }
 
 init() {
-  _forceArg=0
-  _pushArg=0
-  _latestArg=0
-  if is~ "${_args0}" "--"; then
-    _args1="${_args0%%--*}"
-    _args2="${_args0#*--}"
-    yellow "docker_build arguments: ${_args2}"
+  ARG_FORCE=0
+  ARG_PUSH=0
+  ARG_LATEST=0
+  if is~ "${MY_ARGS}" "--"; then
+    MY_ARGS1="${MY_ARGS%%--*}"
+    MY_ARGS2="${MY_ARGS#*--}"
+    yellow "docker_build arguments: ${MY_ARGS2}"
   else
-    _args1="${_args0}"
-    _args2=""
+    MY_ARGS1="${MY_ARGS}"
+    MY_ARGS2=""
   fi
   local arg=""
-  while getopts FLPSVp:t: arg ${_args1}; do
+  while getopts FLPSVp:s:t: arg ${MY_ARGS1}; do
     case "${arg}" in
-      F) _forceArg=1;;
-      L) _latestArg=1;;
-      P) _pushArg=1;;
-      p) _planArg="${OPTARG}";;
-      t) _imgTagArg="${OPTARG}";;
-      S) _skipBuildShArg=1;;
+      F) ARG_FORCE=1;;
+      L) ARG_LATEST=1;;
+      P) ARG_PUSH=1;;
+      p) ARG_PLAN="${OPTARG}";;
+      t) ARG_IMG_TAG="${OPTARG}";;
+      s) ARG_BUILD_STAGE="${OPTARG}";;
+      S) ARG_SKIP_BUILDSH=1;;
       *) usage;;
     esac
   done
   # export values for child processes
-  export DECKBUILD_PUSH=${_pushArg}
-  export DECKBUILD_PUSH_LATEST=${_latestArg}
-  export DECKBUILD_FORCE=${_forceArg}
+  export DECKBUILD_PUSH=${ARG_PUSH}
+  export DECKBUILD_PUSH_LATEST=${ARG_LATEST}
+  export DECKBUILD_FORCE=${ARG_FORCE}
 }
 
 init
 buildPlant
 buildImg
-! isb "${_pushArg:-}" || pushImg
+! isb "${ARG_PUSH:-}" || pushImg

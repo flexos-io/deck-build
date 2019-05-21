@@ -1,35 +1,32 @@
+- [`addMetaFile`](#addMetaFile)
 - [`addToBashd`](#addToBashd)
 - [`aptInstall`](#aptInstall)
 - [`black`](#black)
 - [`blue`](#blue)
 - [`cleanDebPkgs`](#cleanDebPkgs)
 - [`cleanTmp`](#cleanTmp)
-- [`clearBasher`](#clearBasher)
 - [`cyan`](#cyan)
 - [`die`](#die)
 - [`dload`](#dload)
 - [`error`](#error)
+- [`getArg`](#getArg)
 - [`getGitHubLatest`](#getGitHubLatest)
 - [`getUserDp`](#getUserDp)
 - [`getUserHome`](#getUserHome)
 - [`green`](#green)
+- [`hasArg`](#hasArg)
 - [`hasBuildArg`](#hasBuildArg)
 - [`initDebPkgs`](#initDebPkgs)
 - [`initTmp`](#initTmp)
 - [`installBashd`](#installBashd)
-- [`installBasher`](#installBasher)
-- [`installBasherPkg`](#installBasherPkg)
-- [`installDebBatPkg`](#installDebBatPkg)
-- [`installDebPkgs`](#installDebPkgs)
-- [`installDirs`](#installDirs)
-- [`installFlexos`](#installFlexos)
-- [`installFlexosPy`](#installFlexosPy)
-- [`installFlexosSh`](#installFlexosSh)
-- [`installPy`](#installPy)
-- [`installPyPkgs`](#installPyPkgs)
 - [`installSudoUser`](#installSudoUser)
 - [`installUser`](#installUser)
 - [`is`](#is)
+- [`isBuild`](#isBuild)
+- [`isDev`](#isDev)
+- [`isProd`](#isProd)
+- [`isTest`](#isTest)
+- [`isTrial`](#isTrial)
 - [`isb`](#isb)
 - [`isc`](#isc)
 - [`isd`](#isd)
@@ -39,6 +36,7 @@
 - [`isr`](#isr)
 - [`isx`](#isx)
 - [`isz`](#isz)
+- [`lnDir`](#lnDir)
 - [`pink`](#pink)
 - [`red`](#red)
 - [`redBold`](#redBold)
@@ -54,6 +52,23 @@
 - [`yellow`](#yellow)
 
 ***
+
+## `addMetaFile`
+
+Create a metafile that contains informations like the OS version"
+
+#### Usage
+
+```shell
+addMetaFile <destination_directory> [<data_file>]
+```
+
+#### Arguments
+
+- destination_directory
+    - Destination directory for metafile
+- data_file
+    - Append content (`key=value` format) from this file to metafile
 
 ## `addToBashd`
 
@@ -130,12 +145,12 @@ cleanDebPkgs [<delete_files>]
 #### Arguments
 
 - delete_files
-    - Clear also `/var/lib/apt/lists/*` if set to `true` or `1`
+    - Clear also `/var/lib/apt/lists/*`, default is `true`
 
 #### Examples
 
 ```shell
-cleanDebPkgs true
+cleanDebPkgs false
 ```
 
 ## `cleanTmp`
@@ -152,17 +167,7 @@ cleanTmp
 
 ```shell
 cleanTmp              # clean default tmp folder
-initTmp; cleanTmp     # create/clean a custom tmp folder
-```
-
-## `clearBasher`
-
-Clear basher environment (`unset BASHER_*`).
-
-#### Usage
-
-```shell
-clearBasher
+initTmp; cleanTmp     # create and clean a custom tmp folder
 ```
 
 ## `cyan`
@@ -194,7 +199,7 @@ die "No network connection" 5  # exit code is 5
 
 ## `dload`
 
-Download file (`curl https://...`).
+Download file (`curl https://...`). Set `${DECKBUILD_CACHE}` to cache (and reuse) downloaded files in given directory.
 
 #### Usage
 
@@ -205,8 +210,12 @@ dload <url> [<destination_file>]
 #### Examples
 
 ```shell
-dload https://example.org/foo.txt /tmp/foo.txt # download to file
-fooTxt=$(dload https://example.org/foo.txt)    # assign to fooTxt variable
+dload https://example.org /tmp/index.html    # download to file
+txt=$(dload https://example.org/foo.txt)     # assign to "txt" variable
+export DECKBUILD_CACHE=~/cache; dload https://example.org ./index.html
+export DECKBUILD_CACHE=~/cache; dload ...    # cache read-only mode
+export DECKBUILD_CACHE=~/cache:ro; dload ... # cache read-only mode
+export DECKBUILD_CACHE=~/cache:rw; dload ... # cache read-write mode
 ```
 
 ## `error`
@@ -225,9 +234,32 @@ error <message>
 error "Downloading file failed"
 ```
 
+## `getArg`
+
+Get value of given key-value argument.
+
+#### Usage
+
+```shell
+getArg <key-value_argument> [<arguments>]
+```
+
+#### Arguments
+
+- arguments
+    - All arguments, default is `${MY_ARGS}`
+
+#### Examples
+
+```shell
+getArg --foo "-h --foo=bar"              # returns "bar"
+getArg --foo "-h --foo=bar1 --foo=bar2"  # returns "bar2"
+getArg --foo -h                          # returns ""
+```
+
 ## `getGitHubLatest`
 
-Get latest software version of a GitHub repository: Returns the version and sets `${_DECKBUILD_GITHUB_LATEST}`.
+Get latest software version of a GitHub repository: Returns the version and sets `${DECKBUILD_GITHUB_LATEST}`.
 
 #### Usage
 
@@ -278,31 +310,48 @@ Print a green message to stderr.
 green <message>
 ```
 
-## `hasBuildArg`
+## `hasArg`
 
-Check if `${DECKBUILD_ARGS}` contains given argument.
+Check if arguments contain the given argument.
 
 #### Usage
 
 ```shell
-hasBuildArg <arg> [<separator>]
+hasArg <argument> [<arguments>]
 ```
 
 #### Arguments
 
-- separator
-    - Argument separator (e.g. `,`), default is whitespace
+- arguments
+    - All arguments, default is `${MY_ARGS}`
 
 #### Examples
 
 ```shell
-hasBuildArg -h
-hasBuildArg -A ,
+hasArg -h "-h --foo"
+hasArg --foo "-h --foo=bar"
+hasArg -A
+```
+
+## `hasBuildArg`
+
+Check if `${DECKBUILD_ARGS}` contains the given argument.
+
+#### Usage
+
+```shell
+hasBuildArg <argument>
+```
+
+#### Examples
+
+```shell
+hasBuildArg -e
 ```
 
 ## `initDebPkgs`
 
-Update debian package repository if necessary (`apt-get update`). Necessary means: `${_DECKBUILD_DEB_REPO_INIT}` is not set (`initDebPkgs()` sets `${_DECKBUILD_DEB_REPO_INIT}` after running).
+Update debian package repository (`apt-get update`).
 
 #### Usage
 
@@ -310,15 +359,9 @@ Update debian package repository if necessary (`apt-get update`). Necessary mean
 initDebPkgs
 ```
 
-#### Examples
-
-```shell
-unset ${_DECKBUILD_DEB_REPO_INIT}; initDebPkgs  # force action
-```
-
 ## `initTmp`
 
-Create a temporary directory (`mktemp -d`) and export the path as `${_DECKBUILD_TMP}`. BUT: You don't need to run `initTmp()` because a default tmp folder is always available.
+Create a temporary directory (`mktemp -d`) and export the path as `${DECKBUILD_TMP}`. BUT: You don't need to run `initTmp()` because a default tmp folder is always available.
 
 #### Usage
 
@@ -329,8 +372,8 @@ initTmp
 #### Examples
 
 ```shell
-touch ${_DECKBUILD_TMP}/foo.txt          # use default tmp folder
-initTmp; touch ${_DECKBUILD_TMP}/foo.txt # create/use a custom tmp folder
+touch ${DECKBUILD_TMP}/foo.txt          # use default tmp folder
+initTmp; touch ${DECKBUILD_TMP}/foo.txt # create/use a custom tmp folder
 ```
 
 ## `installBashd`
@@ -354,165 +397,6 @@ installBashd [<directory_path>]
 installBashd            # creates /root/.bash.d
 sudof foo installBashd  # creates /home/foo/.bash.d
 installBashd /etc       # creates /etc/bash.d
-```
-
-## `installBasher`
-
-Install [basher](https://github.com/basherpm/basher) environment (for specific user). BUT: Don't call this function directly, use `installBasherPkg()` instead.
-
-#### Usage
-
-```shell
-installBasher
-```
-
-#### Examples
-
-```shell
-installBasher            # install basher for root
-sudof foo installBasher  # install basher for user foo
-```
-
-## `installBasherPkg`
-
-Install a [basher](https://github.com/basherpm/basher) package (see `installBasher()` for basher details).
-
-#### Usage
-
-```shell
-installBasherPkg
-```
-
-#### Examples
-
-```shell
-installBasherPkg bar            # install bar package for root
-sudof foo installBasherPkg bar  # install bar package for user foo
-```
-
-## `installDebBatPkg`
-
-Install [bat's](https://github.com/sharkdp/bat) latest version.
-
-#### Usage
-
-```shell
-installDebBatPkg
-```
-
-## `installDebPkgs`
-
-Install useful debian packages (`apt-get install sudo curl ...`).
-
-#### Usage
-
-```shell
-installDebPkgs [<mode>]
-```
-
-#### Arguments
-
-- mode
-    - `slim` to install some packages, `fat` to install more packages, default is `slim`
-
-## `installDirs`
-
-Simplify system's directory structure (e.g. merge `/usr/local/bin` and `/usr/local/sbin`).
-
-#### Usage
-
-```shell
-installDirs
-```
-
-## `installFlexos`
-
-Install flexos environment (for specific user).
-
-#### Usage
-
-```shell
-installFlexos [<directory_path>]
-```
-
-#### Arguments
-
-- directory_path
-    - `bash.d` parent folder, see `installBashd()` for details
-
-#### Examples
-
-```shell
-installFlexos            # adds flexos files to root's bash.d folder
-sudo foo installFlexos   # adds flexos files to user foo's bash.d folder
-```
-
-## `installFlexosPy`
-
-Install flexos python packages (for specific user).
-
-#### Usage
-
-```shell
-installFlexosPy
-```
-
-#### Examples
-
-```shell
-installFlexosPy             # install packages for root
-sudof foo installFlexosPy   # install packages for user foo
-```
-
-## `installFlexosSh`
-
-Install flexos [basher](https://github.com/basherpm/basher) packages (for specific user).
-
-#### Usage
-
-```shell
-installFlexosSh
-```
-
-#### Examples
-
-```shell
-installFlexosSh             # install packages for root
-sudof foo installFlexosSh   # install packages for user foo
-```
-
-## `installPy`
-
-Install python environment (for specific user). BUT: Don't call this function directly, use `installPyPkgs()` instead.
-
-#### Usage
-
-```shell
-installPy
-```
-
-#### Examples
-
-```shell
-installPy             # creates /root/.config/pip/pip.conf
-sudof foo installPy   # creates /home/foo/.config/pip/pip.conf
-```
-
-## `installPyPkgs`
-
-Install python packages (for specific user) of given pip-requirements file.
-
-#### Usage
-
-```shell
-installPyPkgs <requirements_file>
-```
-
-#### Examples
-
-```shell
-installPyPkgs /tmp/root_reqs           # install packages for root
-sudof foo installPyPkgs /tmp/foo_reqs  # install packages for user foo
 ```
 
 ## `installSudoUser`
@@ -588,6 +472,105 @@ is <value> <value>
 ```shell
 is foo foo || ...
 if is foo bar; then ...
+```
+
+## `isBuild`
+
+Check if this is the building stage.
+
+#### Usage
+
+```shell
+isBuild
+```
+
+#### Examples
+
+```shell
+isBuild && echo "Yes: Building stage" || echo "No: Not building stage"
+export DECKBUILD_STAGE=build; if isBuild; then ...      # returns true
+export DECKBUILD_STAGE=BUILD; if isBuild; then ...      # returns true
+export DECKBUILD_STAGE=dev; if isBuild; then ...        # returns false
+```
+
+## `isDev`
+
+Check if this is the development stage.
+
+#### Usage
+
+```shell
+isDev
+```
+
+#### Examples
+
+```shell
+isDev && echo "Yes: Development stage" || echo "No: Not development stage"
+export DECKBUILD_STAGE=dev; if isDev; then ...          # returns true
+export DECKBUILD_STAGE=development; if isDev; then ...  # returns true
+export DECKBUILD_STAGE=DEV; if isDev; then ...          # returns true
+export DECKBUILD_STAGE=DEVELOPMENT; if isDev; then ...  # returns true
+export DECKBUILD_STAGE=prod; if isDev; then ...         # returns false
+```
+
+## `isProd`
+
+Check if this is the production stage.
+
+#### Usage
+
+```shell
+isProd
+```
+
+#### Examples
+
+```shell
+isProd && echo "Yes: Production stage" || echo "No: Not production stage"
+export DECKBUILD_STAGE=prod; if isProd; then ...        # returns true
+export DECKBUILD_STAGE=production; if isProd; then ...  # returns true
+export DECKBUILD_STAGE=PROD; if isProd; then ...        # returns true
+export DECKBUILD_STAGE=PRODUCTION; if isProd; then ...  # returns true
+export DECKBUILD_STAGE=dev; if isProd; then ...         # returns false
+```
+
+## `isTest`
+
+Check if this is the test stage.
+
+#### Usage
+
+```shell
+isTest
+```
+
+#### Examples
+
+```shell
+isTest && echo "Yes: test stage" || echo "No: Not test stage"
+export DECKBUILD_STAGE=test; if isTest; then ...  # returns true
+export DECKBUILD_STAGE=TEST; if isTest; then ...  # returns true
+export DECKBUILD_STAGE=prod; if isTest; then ...  # returns false
+```
+
+## `isTrial`
+
+Check if this is the trial stage.
+
+#### Usage
+
+```shell
+isTrial
+```
+
+#### Examples
+
+```shell
+isTrial && echo "Yes: trial stage" || echo "No: Not trial stage"
+export DECKBUILD_STAGE=trial; if isTrial; then ...  # returns true
+export DECKBUILD_STAGE=TRIAL; if isTrial; then ...  # returns true
+export DECKBUILD_STAGE=prod; if isTrial; then ...   # returns false
 ```
 
 ## `isb`
@@ -746,6 +729,16 @@ isz <value>
 ```shell
 isz "foo" || ...
 if isz ""; then ...
+```
+
+## `lnDir`
+
+Move source data to destination folder and replace source directory by link to destination.
+
+#### Usage
+
+```shell
+lnDir <source_directory> <destination_directory>
 ```
 
 ## `pink`

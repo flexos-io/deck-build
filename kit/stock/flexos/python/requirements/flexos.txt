@@ -1,4 +1,0 @@
-git+https://github.com/flexos-io/flexos-py-base.git
-git+https://github.com/flexos-io/flexos-py-flask.git
-simplejson>3,<4
-requests>2,<3

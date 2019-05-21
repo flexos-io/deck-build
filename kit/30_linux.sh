@@ -100,16 +100,16 @@ installBashd() {
   ##E installBashd /etc       # creates /etc/bash.d
   local dp="${1:-}"
   if isz "${dp}"; then
-    export _DECKBUILD_BASHD=${HOME}/.bash.d
+    export DECKBUILD_BASHD=${HOME}/.bash.d
     local cmdDp="\${HOME}/.bash.d"
     local fp=${HOME}/.bashrc
   else
-    export _DECKBUILD_BASHD=${dp}/bash.d
-    local cmdDp=${_DECKBUILD_BASHD}
+    export DECKBUILD_BASHD=${dp}/bash.d
+    local cmdDp=${DECKBUILD_BASHD}
     local fp=/etc/bash.bashrc
   fi
-  mkdir -p ${_DECKBUILD_BASHD}
-  local cmd="for _fp in ${cmdDp}/*.sh; do . \${_fp}; done; unset _fp"
+  mkdir -p ${DECKBUILD_BASHD}
+  local cmd="for FP in ${cmdDp}/*.sh; do . \${FP}; done; unset FP"
   if ! grep -F -q "${cmd}" ${fp} 2>/dev/null; then
     yellow "Adding bash.d sourcing to ${fp}"
     echo -e "\n# deck-build\n${cmd}\n" >> ${fp} || \
@@ -129,10 +129,10 @@ addToBashd() {
   ##E sudof foo addToBashd ${DECKBUILD_KIT_STOCK}/python/55_python.sh
   local srcFp="${1}"
   installBashd "${2:-}"
-  local dstFp=${_DECKBUILD_BASHD}/$(basename ${srcFp})
+  local dstFp=${DECKBUILD_BASHD}/$(basename ${srcFp})
   yellow "Installing ${dstFp}"
   cp -a ${srcFp} ${dstFp} || \
-    die "Adding ${srcFp} to ${_DECKBUILD_BASHD}/ failed"
+    die "Adding ${srcFp} to ${DECKBUILD_BASHD}/ failed"
   yellow "Sourcing ${dstFp}"
   . ${dstFp} || die "Sourcing ${dstFp} failed"
 }
@@ -155,7 +155,7 @@ sourceBashdFile() {
   fi
   local fp=${dp}/${fn}
   yellow "Sourcing ${fp}"
-  . ${fp} || die "Sourcing ${fp} failed"
+  . ${fp} || die "Sourcing ${fp} failed: Do you miss to call installX()?"
 }
 
 sourceBashdFiles() {
@@ -174,23 +174,9 @@ sourceBashdFiles() {
   fi
   yellow "Sourcing ${dp}/"
   local fp=""
-  for fp in ${dp}/*.sh; do
-    . ${fp} || die "Sourcing ${fp} failed"
-  done
-}
-
-installDirs() {
-  ##D Simplify system's directory structure
-  ##D (e.g. merge `/usr/local/bin` and `/usr/local/sbin`).
-  yellow "Optimizing /usr/local/ and /opt/"
-  mkdir -p -m 755 /usr/local/bin /usr/local/src
-  mv /opt/bin/* /usr/local/bin/ 2>/dev/null || :
-  mv /opt/sbin/* /usr/local/bin/ 2>/dev/null || :
-  mv /opt/src/* /usr/local/src/ 2>/dev/null || :
-  mv /usr/local/sbin/* /usr/local/bin/ 2>/dev/null || :
-  rm -rf /opt/bin /opt/sbin /opt/src /usr/local/sbin
-  ln -s /usr/local/bin /opt/bin
-  ln -s /usr/local/bin /opt/sbin
-  ln -s /usr/local/src /opt/src
-  ln -s /usr/local/bin /usr/local/sbin
+  if ls ${dp}/*.sh >/dev/null 2>&1; then
+    for fp in ${dp}/*.sh; do
+      . ${fp} || die "Sourcing ${fp} failed"
+    done
+  fi
 }

@@ -1,11 +1,10 @@
 
-if [[ " ${DECKBUILD_ARGS:-} " =~ " -e " ]]; then
-  set -o errtrace
-  set -o nounset
-  set -o errexit
-  set -o pipefail
-  #set -o posix
-fi
+export MY_ARGS="${*}"
+export MY_FP="${0}"
+export MY_FN="${MY_FP##*/}"
+export MY_DP=${MY_FP%/*}
 
-for _fp in ${DECKBUILD_KIT}/*_*.sh; do . ${_fp}; done
+for FP in ${DECKBUILD_KIT}/*_*.sh; do . ${FP}; done
+unset FP
+
 initTmp
