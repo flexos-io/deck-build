@@ -3,7 +3,7 @@
 MY_FP=$(readlink -f "${0}")
 MY_FN=$(basename "${MY_FP}")
 MY_ARGS="${*}"
-MY_VERSION=0.2.0
+MY_VERSION=0.4.0
 
 stderr() {
   echo -e "${1}" >&2
@@ -127,6 +127,10 @@ checkIntegrity() {
   then
     die "Plan uses kit's setUser() but \${DECKBUILD_USER_CFG} is not set. See https://github.com/flexos-io/doc/wiki/deck_build#Configuration-Abstract-The-Custom-User"
   fi
+  if grep -q -P '^\s*(COPY|ADD)\s+\.kit/plan/.+$' ${dckrFp}; then
+    ! isz "${DECKBUILD_KIT_PLAN_SRC:-}" || \
+      die "Dockerfile wants to COPY kit-plans but \${DECKBUILD_KIT_PLAN_SRC} is not set"
+  fi
 }
 
 buildPlant() {
@@ -149,9 +153,9 @@ buildPlant() {
     ise ${dckrFp} || die "Opening ${dckrFp} failed"
     checkIntegrity ${planDp} ${dckrFp}
     yellow "Plan: ${planDp}"
-    if isx ${planDp}/build.sh; then
+    if isx ${planDp}/.deck-build.sh; then
       export DECKBUILD_TMP_PLANT=true
-      yellow "build.sh found: Enabling DECKBUILD_TMP_PLANT"
+      yellow ".deck-build.sh found: Enabling DECKBUILD_TMP_PLANT"
     fi
     if isb ${DECKBUILD_TMP_PLANT:-false}; then
       initTmp
@@ -169,6 +173,13 @@ buildPlant() {
       rm -rf ${plantKitDp}
       CLEAN_FPS+=" ${plantKitDp}"
       cp -a ${kitDp} ${plantKitDp}
+      local kitPlanDp=${DECKBUILD_KIT_PLAN_SRC:-}
+      if ! isz "${kitPlanDp}"; then
+        isd ${kitPlanDp} || die "Opening ${kitPlanDp}/ failed"
+        yellow "Kit Plans: ${kitDp}"
+        mkdir ${plantKitDp}/plan
+        cp -rL ${kitPlanDp}/* ${plantKitDp}/plan/
+      fi
     fi
     export DECKBUILD_PLAN_URI=0
     export DECKBUILD_PLAN=${planDp}
@@ -189,18 +200,14 @@ buildImg() {
       yellow "Build file is ${DECKBUILD_DOCKERFILE}"
       dckrFpArg="-f ${DECKBUILD_DOCKERFILE}"
     fi
-    local buildShFp=${plantDp}/build.sh
+    local buildShFp=${plantDp}/.deck-build.sh
     if isx ${buildShFp}; then
-      if isb ${ARG_SKIP_BUILDSH:-}; then
-        yellow "Skipping build.sh"
-      else
-        yellow "Running build.sh"
-        ${buildShFp} || die "Running ${buildShFp} failed"
-      fi
+      yellow "Running .deck-build.sh"
+      ${buildShFp} || die "Running ${buildShFp} failed"
     fi
     local target=./
   fi
-  local dp=/usr/local/flexos/deck/build
+  local dp=/usr/local/flexos/deck/build  # also used in flexos-sh-deck-build.sh
   export DECKBUILD_USER_CFG="${DECKBUILD_USER_CFG:-}"
   export DECKBUILD_ARGS="${DECKBUILD_ARGS:-}"
   docker build ${dckrFpArg} --tag ${DECKBUILD_IMG} ${MY_ARGS2} \
@@ -239,15 +246,14 @@ init() {
     MY_ARGS2=""
   fi
   local arg=""
-  while getopts FLPSVp:s:t: arg ${MY_ARGS1}; do
+  while getopts FLPVp:s:t: arg ${MY_ARGS1}; do
     case "${arg}" in
       F) ARG_FORCE=1;;
       L) ARG_LATEST=1;;
       P) ARG_PUSH=1;;
-      p) ARG_PLAN="${OPTARG}";;
-      t) ARG_IMG_TAG="${OPTARG}";;
-      s) ARG_BUILD_STAGE="${OPTARG}";;
-      S) ARG_SKIP_BUILDSH=1;;
+      p) ARG_PLAN="${OPTARG}";;         # also used in flexos-sh-deck-build.sh
+      t) ARG_IMG_TAG="${OPTARG}";;      # also used in flexos-sh-deck-build.sh
+      s) ARG_BUILD_STAGE="${OPTARG}";;  # also used in flexos-sh-deck-build.sh
       *) usage;;
     esac
   done
