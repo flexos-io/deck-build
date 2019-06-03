@@ -112,7 +112,7 @@ checkIntegrity() {
   #  RUN cd ${DECKBUILD_PLANT} && tar --no-same-owner -zxpf kit.tgz && rm kit.tgz
   #  RUN tar --no-same-owner -zxpf ${DECKBUILD_PLANT}/kit.tgz -C ${DECKBUILD_PLANT} && rm ${DECKBUILD_PLANT}/kit.tgz
   #  COPY .kit ${DECKBUILD_KIT}
-  if grep -q -P '^\s*(COPY|ADD)\s+\.kit\s+\${?DECKBUILD_KIT}?\s*$' ${dckrFp}; then
+  if grep -q -P '^\s*(COPY|ADD)\s+\.kit.+\${?DECKBUILD_KIT}?\s*$' ${dckrFp}; then
     if grep -q -P '^\s*ADD\s+https://github.com/.+/kit\.tgz\s+\${?DECKBUILD_PLANT}?/(kit\.tgz)?\s*$' ${dckrFp} || \
        grep -q -P '^\s*RUN\s+.+\${?DECKBUILD_PLANT}?.+\s+tar\s+.+\s+kit\.tgz(\s+.+)?\s*$' ${dckrFp} || \
        grep -q -P '^\s*RUN\s+(.*\s+)?tar\s+.+\s\${?DECKBUILD_PLANT}?/kit\.tgz(\s+.+)?\s*$' ${dckrFp}
@@ -126,10 +126,6 @@ checkIntegrity() {
      isz "${DECKBUILD_USER_CFG:-}"
   then
     die "Plan uses kit's setUser() but \${DECKBUILD_USER_CFG} is not set. See https://github.com/flexos-io/doc/wiki/deck_build#Configuration-Abstract-The-Custom-User"
-  fi
-  if grep -q -P '^\s*(COPY|ADD)\s+\.kit/plan/.+$' ${dckrFp}; then
-    ! isz "${DECKBUILD_KIT_PLAN_SRC:-}" || \
-      die "Dockerfile wants to COPY kit-plans but \${DECKBUILD_KIT_PLAN_SRC} is not set"
   fi
 }
 
@@ -172,14 +168,7 @@ buildPlant() {
       local plantKitDp=${plantDp}/.kit
       rm -rf ${plantKitDp}
       CLEAN_FPS+=" ${plantKitDp}"
-      cp -a ${kitDp} ${plantKitDp}
-      local kitPlanDp=${DECKBUILD_KIT_PLAN_SRC:-}
-      if ! isz "${kitPlanDp}"; then
-        isd ${kitPlanDp} || die "Opening ${kitPlanDp}/ failed"
-        yellow "Kit Plans: ${kitDp}"
-        mkdir ${plantKitDp}/plan
-        cp -rL ${kitPlanDp}/* ${plantKitDp}/plan/
-      fi
+      cp -rL ${kitDp} ${plantKitDp}
     fi
     export DECKBUILD_PLAN_URI=0
     export DECKBUILD_PLAN=${planDp}
